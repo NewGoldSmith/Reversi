@@ -149,7 +149,6 @@ Game::Game():
 				pNextNode->p_parent = pNode;
 				pNextNode->vp_child_nodes = {};
 				pNextNode->pGame = pNode->pGame;
-				//pNextNode->hWaitEvent = NULL;
 				pNode->vp_child_nodes.push_back(pNextNode);
 
 				if (!(pNextNode->pwk = CreateThreadpoolWork(
@@ -178,7 +177,6 @@ Game::Game():
 				pNextNode->p_parent = pNode;
 				pNextNode->vp_child_nodes = {};
 				pNextNode->pGame = pNode->pGame;
-				//pNextNode->hWaitEvent = NULL;
 				pNode->vp_child_nodes.push_back(pNextNode);
 
 				if (!(pNextNode->pwk = CreateThreadpoolWork(
@@ -714,7 +712,6 @@ bool Game::make_computer_move(pair<int, int>* p_pair)
 
 	update_board(&board, best_row, best_col, 'C');
 	*p_pair = { best_row, best_col };
-	LeaveCriticalSection(&*pcs);
 
 	CloseThreadpoolCleanupGroupMembers(&*ptpcg, TRUE, NULL);
 	node_cut(p_root_node);
