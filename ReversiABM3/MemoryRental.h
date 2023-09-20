@@ -80,7 +80,7 @@ public:
 			<< "front:" << std::to_string(front)
 			<< " end:" << std::to_string(end)
 			<< " Difference:" << std::to_string((long long)end - (long long)front)
-			<< " NumOfUnit:" << std::to_string(size)
+			<< " AvailableUnitSize:" << std::to_string(size)
 			<< " MaximumPeakUsage:" << std::to_string(max_using)
 			<< "\r\n";
 		OutputDebugStringA(ss.str().c_str());
