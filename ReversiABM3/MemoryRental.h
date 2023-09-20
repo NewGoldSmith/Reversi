@@ -60,10 +60,10 @@ public:
 			ppBuf[i] = &pBufIn[i];
 		}
 	}
-	MemoryRental(MemoryRental& obj) = delete;
-	MemoryRental(MemoryRental&& obj) = delete;
-	MemoryRental operator ()(MemoryRental& obj) = delete;
-	MemoryRental operator =(MemoryRental& obj) = delete;
+	MemoryRental(const MemoryRental&) = delete;
+	MemoryRental(const MemoryRental&&)noexcept = delete;
+	MemoryRental operator ()(const MemoryRental&) = delete;
+	MemoryRental operator =(const MemoryRental& obj) = delete;
 	~MemoryRental()
 	{
 #ifdef USING_CRITICAL_SECTION
