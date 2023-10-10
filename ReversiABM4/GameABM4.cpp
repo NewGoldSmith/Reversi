@@ -113,9 +113,6 @@ Game::Game():
 		{
 			pNode->score = pNode->pGame->
 				alphabeta(&pNode->board, pNode->player, 0, -INF, INF);
-			if (pNode->score == BREAK_CODE) {
-				return;
-			}
 			pNode->pGame->return_minimax(pNode);
 			return;
 		}
@@ -128,7 +125,7 @@ Game::Game():
 			if (pairs.empty()) {
 				// 勝敗確定
 				_D("勝敗確定 (" + to_string(pNode->row + 1) + "," + to_string(pNode->col + 1) + ")");
-				pNode->score = pNode->pGame->evaluate(&pNode->board, 'C', pNode->depth);
+				pNode->score = pNode->pGame->evaluate(&pNode->board,'C');
 				pNode->pGame->return_minimax(pNode);
 				return;
 			}
@@ -250,8 +247,9 @@ void Game::return_minimax( node_t* const p_child)
 	};
 
 	if (!p_child->p_parent->p_parent) {
-		// p_child->p_parent->がルートノードの場合
-
+		_D("Turn:" + to_string(turn) + " return score to first node"
+			+ "(" + to_string(p_child->row + 1) + ","
+			+ to_string(p_child->col + 1) + "):" + to_string(p_child->score));
 		p_child->p_parent->called_children_cnt++;
 
 		unique_ptr<CRITICAL_SECTION, decltype(LeaveCriticalSection)*> lock_game = {
@@ -259,8 +257,8 @@ void Game::return_minimax( node_t* const p_child)
 			,LeaveCriticalSection };
 
 		if (best_val < p_child->score) {
-			_D("update score" + "(" + to_string(p_child->row+1) + "," 
-				+ to_string(p_child->col+1) + "):" + to_string(p_child->score));
+			_D("Turn:" + to_string(turn) + " update score" + "(" + to_string(p_child->row + 1) + ","
+				+ to_string(p_child->col + 1) + "):" + to_string(p_child->score));
 			best_val = p_child->score;
 			best_row = p_child->row;
 			best_col = p_child->col;
@@ -332,9 +330,11 @@ void Game::play_game(bool human_first, bool two_player)
 				if ((get_valid_moves(&board, 'X')).empty())
 				{
 					cout << "プレイヤー " << current_player
-						<< "パスになります。何かキーを押してください。";
+						<< "パスになります。何かキーを押してください。" << endl;
 					string str;
 					getline(cin, str);
+					cin.clear();
+					cout << endl;
 					display_board();
 					cout << endl;
 					break;
@@ -436,12 +436,12 @@ bool Game::is_valid_move(const board_t* const p_board, int row, int col, char pl
 	const int dx[] = { -1, -1, -1, 0, 1, 1, 1, 0 };
 	const int dy[] = { -1, 0, 1, 1, 1, 0, -1, -1 };
 	char opponent = player == 'X' ? 'C' : 'X';
-#pragma loop(hint_parallel(0))
+
 	for (int dir = 0; dir < 8; dir++) {
 		int x = row + dx[dir];
 		int y = col + dy[dir];
 		bool found_opponent = false;
-#pragma loop(hint_parallel(0))
+
 		while (x >= 0 && x < N && y >= 0 && y < N && (*p_board)[x][y] == opponent) {
 			found_opponent = true;
 			x += dx[dir];
@@ -509,37 +509,33 @@ void Game::update_board(board_t* const p_board, int row, int col, char ch)const
 
 void Game::copy_board(board_t* const pdist, const board_t* const psource)const
 {
-	for (int i(0); i < N; i++)
-		for (int j(0); j < N; j++)
-		{
-			(*pdist)[i][j] = (*psource)[i][j];
-		}
+	std::memcpy(pdist, psource, sizeof(board_t));
 }
-
-pair<int, int> Game::get_each_countXC(const board_t* const p_board)const
-{
-	// それぞれのディスクの数をカウント
-	int x_count = 0;
-	int c_count = 0;
-	for (int row = 0; row < N; row++)
-		for (int col = 0; col < N; col++)
-			if ((*p_board)[row][col] == 'X')
-				x_count++;
-			else if ((*p_board)[row][col] == 'C')
-				c_count++;
-
-	// スコアを返す
-	return make_pair(x_count, c_count);
-}
+//
+//pair<int, int> Game::get_each_countXC(const board_t* const p_board)const
+//{
+//	// それぞれのディスクの数をカウント
+//	int x_count = 0;
+//	int c_count = 0;
+//	for (int i = 0; i < sizeof(board_t); ++i) {
+//		if (*((char*)p_board + i) == 'X')
+//			x_count++;
+//		else if (*((char*)p_board + i) == 'C')
+//			c_count++;
+//	}
+//	// スコアを返す
+//	return { x_count, c_count };
+//}
 
 int Game::get_count(const board_t* const p_board, const char player) const
 {
 	// playerのディスクの数をカウント
 	int count = 0;
-	for (int row = 0; row < N; row++)
-		for (int col = 0; col < N; col++)
-			if ((*p_board)[row][col] == player)
-				count++;
+	for (int i = 0; i < sizeof(board_t); ++i) {
+		if (*((char*)p_board+i) == player) {
+			count++;
+		}
+	}
 	return count;
 }
 
@@ -553,116 +549,82 @@ int Game::both_count(const board_t* const p_board) const
 	return count;
 }
 
-int Game::evaluate(const board_t* const p_board, char player, int depth)const
+int Game::evaluate(const board_t* const p_board, char player)const
 {
 	// 評価値を計算
 	return get_count(p_board, player) - get_count(p_board, player == 'C' ? 'X' : 'C');
 }
+//
+//int Game::evaluateG(const board_t* const p_board, int depth) const
+//{
+//	int AddScore = 0;
+//	AddScore += (*p_board)[0][0] == 'X' ? -32 : (*p_board)[0][0] == 'C' ? 32 : 0;
+//	AddScore += (*p_board)[0][7] == 'X' ? -32 : (*p_board)[0][7] == 'C' ? 32 : 0;
+//	AddScore += (*p_board)[7][0] == 'X' ? -32 : (*p_board)[7][0] == 'C' ? 32 : 0;
+//	AddScore += (*p_board)[7][7] == 'X' ? -32 : (*p_board)[7][7] == 'C' ? 32 : 0;
+//	if ((*p_board)[0][0] == ' ') {
+//		AddScore += (*p_board)[1][1] == 'X' ? 18 : (*p_board)[1][1] == 'C' ? -18 : 0;
+//	}
+//	if ((*p_board)[7][0] == ' ') {
+//		AddScore += (*p_board)[6][1] == 'X' ? 18 : (*p_board)[6][1] == 'C' ? -18 : 0;
+//	}
+//	if ((*p_board)[0][7] == ' ') {
+//		AddScore += (*p_board)[1][6] == 'X' ? 18 : (*p_board)[1][6] == 'C' ? -18 : 0;
+//	}
+//	if ((*p_board)[7][7] == ' ') {
+//		AddScore += (*p_board)[6][6] == 'X' ? 18 : (*p_board)[6][6] == 'C' ? -18 : 0;
+//	}
+//
+//	if ((*p_board)[0][0] == ' ') {
+//		AddScore += (*p_board)[1][0] == 'X' ? 17 : (*p_board)[1][0] == 'C' ? -17 : 0;
+//		AddScore += (*p_board)[0][1] == 'X' ? 17 : (*p_board)[0][1] == 'C' ? -17 : 0;
+//	}
+//	if ((*p_board)[7][0] == ' ') {
+//		AddScore += (*p_board)[6][0] == 'X' ? 17 : (*p_board)[6][0] == 'C' ? -17 : 0;
+//		AddScore += (*p_board)[7][1] == 'X' ? 17 : (*p_board)[7][1] == 'C' ? -17 : 0;
+//	}
+//	if ((*p_board)[0][7] == ' ') {
+//		AddScore += (*p_board)[0][6] == 'X' ? 17 : (*p_board)[0][6] == 'C' ? -17 : 0;
+//		AddScore += (*p_board)[1][7] == 'X' ? 17 : (*p_board)[1][7] == 'C' ? -17 : 0;
+//	}
+//	if ((*p_board)[7][7] == ' ') {
+//		AddScore += (*p_board)[6][7] == 'X' ? 17 : (*p_board)[6][7] == 'C' ? -17 : 0;
+//		AddScore += (*p_board)[7][6] == 'X' ? 17 : (*p_board)[7][6] == 'C' ? -17 : 0;
+//	}
+//	// 序盤は中央付近に置くとポイント＋とした。
+//	int cC = get_count(p_board, 'C');
+//	int cX = get_count(p_board, 'X');
+//	if (cC == 0) {
+//		return -INF + depth + AddScore;
+//	}
+//	if (cC + cX - 4 < 16) {
+//		return (cX << 1) - 4 -turn + AddScore;
+//	}
+//	return cC - cX + AddScore;
+//}
 
-int Game::evaluateG(const board_t* const p_board, char player, int depth) const
-{
-	int score(0);
-
-	// 評価値を計算
-	const int ptC_x[] = {0,1,0,1,6,7,6,7};
-	const int ptC_y[] = {1,0,6,7,0,1,7,6};
-	const int ptX_x[] = {1,1,6,6};
-	const int ptX_y[] = {1,6,1,6};
-	const int ptCorner_x[] = {0,0,7,7};
-	const int ptCorner_y[] = {0,7,0,7};
-	const int ptCtCorner_x[] = {2,2,5,5};
-	const int ptCtCorner_y[] = {2,5,2,5};
-	
-	int AddScore = 0;
-	// 序盤は中央付近に置くとポイント＋とした。
-	int turned = both_count(p_board)-4;
-	if (turned < 30) {
-		for (int row(2); row < 6; row++) {
-			for (int col(2); col < 6; col++) {
-				if ((*p_board)[row][col] == player) {
-					AddScore++;
-				}
-				if ((*p_board)[row][col] == (player == 'C' ? 'X' : 'C')) {
-					AddScore--;
-				}
-			}
-		}
-		// 中央付近のコーナーは更にポイントアップ
-		for (int x(0); x < sizeof(ptCtCorner_x) / sizeof(ptCtCorner_x[0]); x++) {
-			for (int y(0); y < sizeof(ptCtCorner_y) / sizeof(ptCtCorner_y[0]); y++) {
-				if ((*p_board)[ptCtCorner_y[y]][ptCtCorner_x[x]] == player) {
-					AddScore += 1;
-				}
-				if ((*p_board)[ptCtCorner_y[y]][ptCtCorner_x[x]] ==
-					(player == 'C' ? 'X' : 'C')) {
-					AddScore -= 1;
-				}
-			}
-		}
-		// コーナーに無い時、X、Cの位置に有れば減点。
-
-		AddScore += check_corner(p_board, player, 0, 0, 1, 1);
-		AddScore += check_corner(p_board, player, 7, 0, -1, 1);
-		AddScore += check_corner(p_board, player, 0, 7, 1, -1);
-		AddScore += check_corner(p_board, player, 7, 7, -1, -1);
-
-		// コーナーに打つとポイントアップ
-		//for (int x(0); x < sizeof(ptCorner_x) / sizeof(ptCorner_x[0]); x++) {
-		//	for (int y(0); y < sizeof(ptCorner_y) / sizeof(ptCorner_y[0]); y++) {
-		//		if ((*p_board)[ptCorner_y[y]][ptCorner_x[x]] == player) {
-		//			AddScore += 14;
-		//		}
-		//		if ((*p_board)[ptCorner_y[y]][ptCorner_x[x]] == (player == 'C' ? 'X' : 'C')) {
-		//			AddScore -= 14;
-		//		}
-		//	}
-		//}
-	}
-	return get_count(p_board, player) + AddScore
-		- get_count(p_board, player == 'C' ? 'X' : 'C');
-}
-
-int Game::check_corner(const board_t* const p_board, char player, int x, int y, int dx, int dy)const
-{
-	int Add(0);
-	if ((*p_board)[x][y] == ' ') {
-		if ((*p_board)[x + dx][y] == player) {
-			Add -= 8;
-		}
-
-		if ((*p_board)[x][y + dy] == player) {
-			Add -= 8;
-		}
-
-		if ((*p_board)[x + dx][y + dy] == player) {
-			Add -= 16;
-		}
-	}
-	else {
-		//コーナーに打つとポイントアップ
-		if ((*p_board)[x][y] == player) {
-			Add += 16;
-		}
-	}
-	return Add;
-}
+//int Game::evaluateS(const board_t* const p_board) const
+//{
+//	// 評価値を計算
+//	return get_count(p_board, 'C') - get_count(p_board, 'X');
+//}
 
 int Game::alphabeta(const board_t* const p_board, const char player, int depth, int alpha, int beta)const
 {
 	if (depth >= SECOND_DEPTH)
 	{
-		int score = evaluate(p_board, 'C', depth);
+		int score = evaluate(p_board,'C');
 		return score;
 	}
 
 	char next_player = player == 'X' ? 'C' : 'X';
-	vector<pair<int, int>> pairs = get_valid_moves(&board, next_player);
+	vector<pair<int, int>> pairs = move(get_valid_moves(p_board, next_player));
 	if (pairs.empty()) {
 		next_player = next_player == 'X' ? 'C' : 'X';
-		pairs = get_valid_moves(&board, next_player);
+		pairs = move(get_valid_moves(p_board, next_player));
 		if (pairs.empty()) {
 			_D("勝敗確定");
-			return evaluate(p_board, 'C', depth) > 0 ? INF - depth : -INF + depth;
+			return evaluate(p_board,'C') > 0 ? INF - depth : -INF + depth;
 		}
 	}
 
@@ -698,18 +660,18 @@ int Game::minimax(const board_t* const p_board, const char player, int depth)con
 {
 	if (depth >= MAX_DEPTH)
 	{
-		int score = evaluate(p_board, 'C', depth);
+		int score = evaluate(p_board,'C');
 		return score;
 	}
 
 	char next_player = player == 'X' ? 'C' : 'X';
-	vector<pair<int, int>> pairs = get_valid_moves(&board, next_player);
+	vector<pair<int, int>> pairs = get_valid_moves(p_board, next_player);
 	if (pairs.empty()) {
 		next_player = next_player == 'X' ? 'C' : 'X';
 		pairs = get_valid_moves(&board, next_player);
 		if (pairs.empty()) {
 			_D("勝敗確定");
-			return evaluate(p_board, 'C', depth) > 0 ? INF - depth : -INF + depth;
+			return evaluate(p_board,'C') > 0 ? INF - depth : -INF + depth;
 		}
 	}
 
@@ -746,7 +708,7 @@ bool Game::make_computer_move(pair<int, int>* p_pair)
 		return false;
 	cout << "コンピューター思考中・・・" << endl;
 
-	_D("Num of first nodes:" + to_string(v_pairs.size()));
+	_D("Turn :" + to_string(turn) + " Num of first nodes:" + to_string(v_pairs.size()));
 
 	p_root_node = mr_Node.Lend();
 	p_root_node->player = 'X';
@@ -819,7 +781,7 @@ bool Game::make_computer_move(pair<int, int>* p_pair)
 	return true;
 }
 
-void Game::dout_board_()const
+void Game::dout_board_(const board_t* const p_board)const
 {
 	stringstream ss;
 	ss << " ";
@@ -829,7 +791,7 @@ void Game::dout_board_()const
 	for (int row = 0; row < N; row++) {
 		ss << row + 1;
 		for (int col = 0; col < N; col++)
-			ss << "|" << board[row][col];
+			ss << "|" << (*p_board)[row][col];
 		ss << "|" << endl;
 		ss << " ";
 		for (int col = 0; col < N; col++)

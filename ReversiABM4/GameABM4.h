@@ -24,10 +24,10 @@ using namespace std;
 constexpr int N = 8;
 constexpr int INF = 10000;
 constexpr int BREAK_CODE = INF + 5;
-constexpr int FIRST_DEPTH = 2;
-constexpr int SECOND_DEPTH = 11;
+constexpr int FIRST_DEPTH = 1;
+constexpr int SECOND_DEPTH =10;
 constexpr int MAX_DEPTH = FIRST_DEPTH + SECOND_DEPTH;
-constexpr unsigned MAX_THREAD = 6;
+constexpr unsigned MAX_THREAD = 1;
 constexpr unsigned NODE_UNIT_SIZE = 0x1000;
 void dout(const string& str);
 #if defined(_DEBUG)
@@ -165,12 +165,12 @@ private:
 	/// <param name="ch">手番のプレイヤー</param>
 	void update_board(board_t* const p_board, int row, int col, char ch)const;
 	void copy_board(board_t* const pdist, const board_t* const psource)const;
-	/// <summary>
-	/// それぞれの数を得る。
-	/// </summary>
-	/// <param name="p_board">スコアを得る盤面のポインタ。</param>
-	/// <returns>std::pair型のスコア。first Xの数。second Cの数。</returns>
-	pair<int, int> get_each_countXC(const board_t* const p_board)const;
+	///// <summary>
+	///// それぞれの数を得る。
+	///// </summary>
+	///// <param name="p_board">スコアを得る盤面のポインタ。</param>
+	///// <returns>std::pair型のスコア。first Xの数。second Cの数。</returns>
+	//pair<int, int> get_each_countXC(const board_t* const p_board)const;
 	int get_count(const board_t* const p_board,const char player)const;
 	int both_count(const board_t* const p_board)const;
 	/// <summary>
@@ -180,9 +180,9 @@ private:
 	/// <param name="depth">読み深さ</param>
 	/// <param name="pb_is_seddled">決着が着いたか着いてないかの結果を受け取るポインタ。</param>
 	/// <returns>評価値</returns>
-	int evaluate(const board_t* const  p_board, char ch, int depth)const;
-	int evaluateG(const board_t* const  p_board, char ch, int depth)const;
-	int check_corner(const board_t* const p_board,char player,int x, int y, int dx, int dy)const;
+	int evaluate(const board_t* const  p_board, char ch)const;
+	//int evaluateG(const board_t* const  p_board, int depth)const;
+	//int evaluateS(const board_t* const  p_board)const;
 	int alphabeta(const board_t* const p_board, const char player, int depth, int alpha, int beta)const;
 	int minimax(const board_t* const p_poard, const char player, int depth)const;
 	/// <summary>
@@ -195,11 +195,11 @@ private:
 	/// <summary>
 	/// デバック出力にボードを表示。
 	/// </summary>
-	void dout_board_()const;
+	void dout_board_(const board_t* const p_board)const;
 #if defined(_DEBUG)
-#define dout_board() dout_board_()
+#define dout_board(p_board) dout_board_(p_board)
 #else
-#define dout_board() __noop
+#define dout_board(p_board) __noop
 #endif
 };
 
