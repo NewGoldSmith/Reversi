@@ -20,8 +20,8 @@
 #include <iomanip>
 using namespace std;
 constexpr int N = 8;
+constexpr int MAX_DEPTH = 7;
 constexpr int INF = 1000000;
-constexpr int MAX_DEPTH = 9;
 
 void dout(const string& str);
 #if defined(_DEBUG)
@@ -120,7 +120,7 @@ private:
 	/// <param name="depth">読み深さ</param>
 	/// <param name="pb_is_seddled">決着が着いたか着いてないかの結果を受け取るポインタ。</param>
 	/// <returns>評価値</returns>
-	int evaluate(const board_t* p_board, char ch, int depth)const;
+	int evaluate(const board_t* p_board, char ch)const;
 	/// <summary>
 	/// 先読み関数。
 	/// </summary>

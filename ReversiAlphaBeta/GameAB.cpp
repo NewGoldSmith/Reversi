@@ -283,26 +283,19 @@ pair<int, int> Game::get_each_countXC(const board_t* p_board)const
 				c_count++;
 
 	// スコアを返す
-	return make_pair(x_count, c_count);
+	return { x_count, c_count };
 }
 
-int Game::evaluate(const board_t* p_board, char ch, int depth)const
+int Game::evaluate(const board_t* p_board, char player)const
 {
-	int score(0);
-	if (is_win(p_board, ch)) {
-		score = INF - depth;
-		return score;
-	}
-	else if (is_win(p_board, ch == 'C' ? 'X' : 'C')) {
-		score = -INF + depth;
-		return score;
-	}
 	auto pair = get_each_countXC(p_board);
-	// 評価値を計算
-	score = pair.first - pair.second;
-	if (ch == 'C')
-		score = -score;
-	return score;
+	if (player == 'X') {
+		// 評価値を計算
+		return pair.first - pair.second;
+	}
+	else {
+		return pair.second - pair.first;
+	}
 }
 
 int Game::minimax(const board_t* p_board, int depth, char ch)const
@@ -314,23 +307,23 @@ int Game::alphabeta(const board_t* p_board,const char player, int depth, int alp
 {
 	if (depth >= MAX_DEPTH)
 	{
-		int score = evaluate(p_board, 'C', depth);
+		int score = evaluate(p_board, 'C');
 		return score;
 	}
 
 	char next_player = player == 'X' ? 'C' : 'X';
-	vector<pair<int, int>> pairs = get_valid_moves(&board, next_player);
+	vector<pair<int,int>> pairs = move(get_valid_moves(p_board, next_player));
 	if (pairs.empty()) {
 		next_player = next_player == 'X' ? 'C' : 'X';
-		pairs = get_valid_moves(&board, next_player);
+		pairs = move(get_valid_moves(p_board, next_player));
 		if (pairs.empty()) {
 			_D("勝敗確定");
-			return evaluate(p_board, 'C', depth);
+			return evaluate(p_board, 'C');
 		}
 	}
 
 	if ('C' == next_player) {
-		for (auto a_pair : pairs) {
+		for (const auto &a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
@@ -343,7 +336,7 @@ int Game::alphabeta(const board_t* p_board,const char player, int depth, int alp
 		return alpha;
 	}
 	else {
-		for (auto a_pair : pairs) {
+		for (const auto &a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
@@ -362,7 +355,7 @@ bool Game::make_computer_move(pair<int, int>* p_pair)
 	int best_val = -INF;
 	int best_row = -1;
 	int best_col = -1;
-	auto v_pairs = std::move(get_valid_moves(&board, 'C'));
+	const vector<pair<int,int>> &v_pairs = move(get_valid_moves(&board, 'C'));
 	if (v_pairs.empty())
 		return false;
 	cout << "コンピューター思考中・・・" << endl;
@@ -370,7 +363,7 @@ bool Game::make_computer_move(pair<int, int>* p_pair)
 		board_t tmp_board{};
 		copy_board(&tmp_board, &board);
 		update_board(&tmp_board,pair.first,pair.second, 'C');
-		int move_val = minimax(&tmp_board, 1, 'C');
+		int move_val = alphabeta(&tmp_board, 'C', 1, -INF, INF);
 		if (move_val >= best_val) {
 			best_row = pair.first;
 			best_col = pair.second;
