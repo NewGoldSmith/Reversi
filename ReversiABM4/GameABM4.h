@@ -181,6 +181,7 @@ private:
 	/// <param name="pb_is_seddled">決着が着いたか着いてないかの結果を受け取るポインタ。</param>
 	/// <returns>評価値</returns>
 	int evaluate(const board_t* const  p_board, char ch)const;
+	int evaluateG(const board_t* const p_board, int depth) const;
 	//int evaluateG(const board_t* const  p_board, int depth)const;
 	//int evaluateS(const board_t* const  p_board)const;
 	int alphabeta(const board_t* const p_board, const char player, int depth, int alpha, int beta)const;

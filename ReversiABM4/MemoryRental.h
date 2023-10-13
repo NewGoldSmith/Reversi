@@ -1,28 +1,28 @@
-// Copyright (c) 2022, Gold Smith
+// Copyright (c) 2022-2023 Gold Smith
 // Released under the MIT license
 // https ://opensource.org/licenses/mit-license.php
 #pragma once
 // このクラスはWindows専用です。
 // ********使用条件を設定***********
-#define USING_CRITICAL_SECTION// クリティカルセクション使用する場合
-#define CONFIRM_POINT    // 確認必要の場合
-#define USING_DEBUG_STRING		// デストラクタで整合性確認
+#define USING_CRITICAL_SECTION// クリティカルセクションを使用する場合
+#define CONFIRM_POINT    // 範囲外確認が必要の場合
+#define USING_DEBUG_STRING		// デストラクタで整合性確認をする場合
 // ******条件設定終わり*************
 
 #ifdef USING_DEBUG_STRING
 #define NOMINMAX
 #include <Windows.h>
 #include < algorithm >
-#include <sstream>
+#include <string>
 #endif // USING_DEBUG_STRING
 
 #ifdef USING_CRITICAL_SECTION
 #include <synchapi.h>
 #endif // USING_CRITICAL_SECTION
 
+
 #include <exception>
 #include <atomic>
-#include <string>
 #include <iostream>
 
 template <class T>class MemoryRental
@@ -35,6 +35,9 @@ public:
 		, size(sizeIn)
 		, front(0)
 		, end(0)
+#ifdef USING_DEBUG_STRING
+		, max_using(0)
+#endif // USING_DEBUG_STRING
 		, mask(sizeIn - 1)
 #ifdef USING_CRITICAL_SECTION
 		, cs{}
@@ -53,7 +56,6 @@ public:
 #ifdef USING_CRITICAL_SECTION
 		(void)InitializeCriticalSectionAndSpinCount(&cs, 0);
 #endif // USING_CRITICAL_SECTION
-
 		ppBuf = new T * [sizeIn];
 		for (size_t i(0); i < size; ++i)
 		{
@@ -63,7 +65,7 @@ public:
 	MemoryRental(const MemoryRental&) = delete;
 	MemoryRental(const MemoryRental&&)noexcept = delete;
 	MemoryRental operator ()(const MemoryRental&) = delete;
-	MemoryRental operator =(const MemoryRental& obj) = delete;
+	MemoryRental operator =(const MemoryRental&) = delete;
 	~MemoryRental()
 	{
 #ifdef USING_CRITICAL_SECTION
@@ -109,6 +111,7 @@ public:
 		}
 
 		ppBuf = new T * [sizeIn];
+
 		for (size_t i(0); i < size; ++i)
 		{
 			ppBuf[i] = &pBufIn[i];
@@ -126,13 +129,16 @@ public:
 		if (front + size < end)
 		{
 			std::stringstream ss;
-			ss << __FILE__ << "("<<__LINE__<<"): " <<"Err!\""
-				<<strDebug<< "\" MemoryRental.Lend. Underflow."
-				<<"front[" << std::to_string(front)
-				<< "] end["	<< std::to_string(end)
-				<< "] size["<< std::to_string(size)
-				<< "] end-front="	<< std::to_string((long long)end-front)
-				<<"\r\n";
+			ss << __FILE__ << "(" << __LINE__ << "): " << "Err!"
+#ifdef USING_DEBUG_STRING
+				<< "\"" << strDebug << "\""
+#endif// USING_DEBUG_STRING
+				<< "MemoryRental.Lend.Underflow."
+				<< "front[" << std::to_string(front)
+				<< "] end[" << std::to_string(end)
+				<< "] size[" << std::to_string(size)
+				<< "] end-front=" << std::to_string((long long)end - front)
+				<< "\r\n";
 			std::cerr << ss.str();
 #ifdef USING_DEBUG_STRING
 			::OutputDebugStringA(ss.str().c_str());
@@ -160,7 +166,10 @@ public:
 		{
 			std::stringstream ss;
 			ss << __FILE__ << "(" << __LINE__ << "): " << "Err!\""
-				<< strDebug << "\" MemoryRental.Return.  Overflow."
+#ifdef USING_DEBUG_STRING
+				<< "\"" << strDebug << "\""
+#endif// USING_DEBUG_STRING
+				<< "\" MemoryRental.Return.  Overflow."
 				<< "front[" << std::to_string(front)
 				<< "] end[" << std::to_string(end)
 				<< "] size[" << std::to_string(size)
@@ -186,7 +195,7 @@ public:
 	}
 
 protected:
-	T** ppBuf;
+	T * *ppBuf; 
 	size_t size;
 	size_t front;
 	size_t end;
@@ -196,7 +205,6 @@ protected:
 #endif // USING_CRITICAL_SECTION
 
 #ifdef USING_DEBUG_STRING
-	//std::atomic_size_t max_using;
 	size_t max_using;
 	std::string strDebug;
 #endif // USING_DEBUG_STRING
@@ -215,4 +223,3 @@ protected:
 #undef NOMINMAX
 #undef USING_DEBUG_STRING
 #endif // USING_DEBUG_STRING
-

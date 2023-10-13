@@ -554,54 +554,71 @@ int Game::evaluate(const board_t* const p_board, char player)const
 	// 評価値を計算
 	return get_count(p_board, player) - get_count(p_board, player == 'C' ? 'X' : 'C');
 }
-//
-//int Game::evaluateG(const board_t* const p_board, int depth) const
-//{
-//	int AddScore = 0;
-//	AddScore += (*p_board)[0][0] == 'X' ? -32 : (*p_board)[0][0] == 'C' ? 32 : 0;
-//	AddScore += (*p_board)[0][7] == 'X' ? -32 : (*p_board)[0][7] == 'C' ? 32 : 0;
-//	AddScore += (*p_board)[7][0] == 'X' ? -32 : (*p_board)[7][0] == 'C' ? 32 : 0;
-//	AddScore += (*p_board)[7][7] == 'X' ? -32 : (*p_board)[7][7] == 'C' ? 32 : 0;
-//	if ((*p_board)[0][0] == ' ') {
-//		AddScore += (*p_board)[1][1] == 'X' ? 18 : (*p_board)[1][1] == 'C' ? -18 : 0;
-//	}
-//	if ((*p_board)[7][0] == ' ') {
-//		AddScore += (*p_board)[6][1] == 'X' ? 18 : (*p_board)[6][1] == 'C' ? -18 : 0;
-//	}
-//	if ((*p_board)[0][7] == ' ') {
-//		AddScore += (*p_board)[1][6] == 'X' ? 18 : (*p_board)[1][6] == 'C' ? -18 : 0;
-//	}
-//	if ((*p_board)[7][7] == ' ') {
-//		AddScore += (*p_board)[6][6] == 'X' ? 18 : (*p_board)[6][6] == 'C' ? -18 : 0;
-//	}
-//
-//	if ((*p_board)[0][0] == ' ') {
-//		AddScore += (*p_board)[1][0] == 'X' ? 17 : (*p_board)[1][0] == 'C' ? -17 : 0;
-//		AddScore += (*p_board)[0][1] == 'X' ? 17 : (*p_board)[0][1] == 'C' ? -17 : 0;
-//	}
-//	if ((*p_board)[7][0] == ' ') {
-//		AddScore += (*p_board)[6][0] == 'X' ? 17 : (*p_board)[6][0] == 'C' ? -17 : 0;
-//		AddScore += (*p_board)[7][1] == 'X' ? 17 : (*p_board)[7][1] == 'C' ? -17 : 0;
-//	}
-//	if ((*p_board)[0][7] == ' ') {
-//		AddScore += (*p_board)[0][6] == 'X' ? 17 : (*p_board)[0][6] == 'C' ? -17 : 0;
-//		AddScore += (*p_board)[1][7] == 'X' ? 17 : (*p_board)[1][7] == 'C' ? -17 : 0;
-//	}
-//	if ((*p_board)[7][7] == ' ') {
-//		AddScore += (*p_board)[6][7] == 'X' ? 17 : (*p_board)[6][7] == 'C' ? -17 : 0;
-//		AddScore += (*p_board)[7][6] == 'X' ? 17 : (*p_board)[7][6] == 'C' ? -17 : 0;
-//	}
-//	// 序盤は中央付近に置くとポイント＋とした。
-//	int cC = get_count(p_board, 'C');
-//	int cX = get_count(p_board, 'X');
-//	if (cC == 0) {
-//		return -INF + depth + AddScore;
-//	}
-//	if (cC + cX - 4 < 16) {
-//		return (cX << 1) - 4 -turn + AddScore;
-//	}
-//	return cC - cX + AddScore;
-//}
+
+int Game::evaluateG(const board_t* const p_board, int depth) const
+{
+	// 'C'から見て相手'X'に隅に置かれていたら減点、自身が置いていたら加点。
+	int AddScore = 0;
+	AddScore += (*p_board)[0][0] == 'X' ? -32 : (*p_board)[0][0] == 'C' ? 32 : 0;
+	AddScore += (*p_board)[0][7] == 'X' ? -32 : (*p_board)[0][7] == 'C' ? 32 : 0;
+	AddScore += (*p_board)[7][0] == 'X' ? -32 : (*p_board)[7][0] == 'C' ? 32 : 0;
+	AddScore += (*p_board)[7][7] == 'X' ? -32 : (*p_board)[7][7] == 'C' ? 32 : 0;
+
+	// 'C'から見て、隅に置かれて無い時に、自身が斜め隣に
+	// 置いたら減点、相手が置いたら加点
+	if ((*p_board)[0][0] == ' ') {
+		AddScore += (*p_board)[1][1] == 'X' ? 18 : (*p_board)[1][1] == 'C' ? -18 : 0;
+	}
+	if ((*p_board)[7][0] == ' ') {
+		AddScore += (*p_board)[6][1] == 'X' ? 18 : (*p_board)[6][1] == 'C' ? -18 : 0;
+	}
+	if ((*p_board)[0][7] == ' ') {
+		AddScore += (*p_board)[1][6] == 'X' ? 18 : (*p_board)[1][6] == 'C' ? -18 : 0;
+	}
+	if ((*p_board)[7][7] == ' ') {
+		AddScore += (*p_board)[6][6] == 'X' ? 18 : (*p_board)[6][6] == 'C' ? -18 : 0;
+	}
+
+	// 'C'から見て、隅に置かれて無い時に、自身が縦横の隣に
+	// 置いたら減点、相手が置いたら加点
+	if ((*p_board)[0][0] == ' ') {
+		AddScore += (*p_board)[1][0] == 'X' ? 17 : (*p_board)[1][0] == 'C' ? -17 : 0;
+		AddScore += (*p_board)[0][1] == 'X' ? 17 : (*p_board)[0][1] == 'C' ? -17 : 0;
+	}
+	if ((*p_board)[7][0] == ' ') {
+		AddScore += (*p_board)[6][0] == 'X' ? 17 : (*p_board)[6][0] == 'C' ? -17 : 0;
+		AddScore += (*p_board)[7][1] == 'X' ? 17 : (*p_board)[7][1] == 'C' ? -17 : 0;
+	}
+	if ((*p_board)[0][7] == ' ') {
+		AddScore += (*p_board)[0][6] == 'X' ? 17 : (*p_board)[0][6] == 'C' ? -17 : 0;
+		AddScore += (*p_board)[1][7] == 'X' ? 17 : (*p_board)[1][7] == 'C' ? -17 : 0;
+	}
+	if ((*p_board)[7][7] == ' ') {
+		AddScore += (*p_board)[6][7] == 'X' ? 17 : (*p_board)[6][7] == 'C' ? -17 : 0;
+		AddScore += (*p_board)[7][6] == 'X' ? 17 : (*p_board)[7][6] == 'C' ? -17 : 0;
+	}
+
+	int cC = get_count(p_board, 'C');
+	int cX = get_count(p_board, 'X');
+	if (cC == 0) {
+		return -INF + depth;
+	}
+	else if (cX == 0) {
+		return INF - depth;
+	}
+
+	// 'C'から見て、序盤は中央付近に置くと加点、相手に置かれると減点とした。
+	if (cC + cX - 4 < 16) {
+		for (int row(2); row <= 5; ++row) {
+			for (int col(2); col <= 5; ++col) {
+				if ((*p_board)[row][col] != ' ') {
+					AddScore += (*p_board)[row][col] == 'C' ? 1 : -1;
+				}
+			}
+		}
+	}
+	return cC - cX + AddScore;
+}
 
 //int Game::evaluateS(const board_t* const p_board) const
 //{
@@ -758,6 +775,7 @@ bool Game::make_computer_move(pair<int, int>* p_pair)
 		int i=0;
 	}
 
+	EnterCriticalSection(&cs);
 #if defined(_DEBUG)
 	// 有効な選択肢が選択されたかチェック
 	stringstream ss;
@@ -774,7 +792,7 @@ bool Game::make_computer_move(pair<int, int>* p_pair)
 
 	update_board(&board, best_row, best_col, 'C');
 	*p_pair = { best_row, best_col };
-
+	LeaveCriticalSection(&cs);
 	CloseThreadpoolCleanupGroupMembers(&*ptpcg, TRUE, NULL);
 	node_cut(p_root_node);
 
