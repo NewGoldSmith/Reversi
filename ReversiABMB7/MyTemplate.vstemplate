@@ -1,0 +1,26 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>ReversiABM6</Name>
+    <Description>&lt;説明はありません。&gt;</Description>
+    <ProjectType>VC</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>ReversiABM6</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <Icon>__TemplateIcon.ico</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="ReversiABM6.vcxproj" File="ReversiABM6.vcxproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="false" TargetFileName="$projectname$.vcxproj.filters">ReversiABM6.vcxproj.filters</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="GameABM6.cpp">GameABM6.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="mainABM6.cpp">mainABM6.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="GameABM6.h">GameABM6.h</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="mainABM6.h">mainABM6.h</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="MemoryRental.h">MemoryRental.h</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

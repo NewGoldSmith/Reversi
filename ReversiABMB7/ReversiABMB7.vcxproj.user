@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RemoteDebug|x64'">
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>\\192.168.100.205\usera\$(SolutionName)\$(Configuration)\$(ProjectName)-$(Configuration)-$(PlatformTarget)-$(CharacterSet).exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>\\192.168.100.205\usera\$(SolutionName)\$(Configuration)\</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>192.168.100.205</RemoteDebuggerServerName>
+    <DeploymentDirectory>$(OutDirFullPath)</DeploymentDirectory>
+    <AdditionalFiles>C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.36.32532\debug_nonredist\x64\Microsoft.VC143.DebugCRT\*.*</AdditionalFiles>
+    <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
+    <RemoteDebuggerDeployCppRuntime>false</RemoteDebuggerDeployCppRuntime>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RemoteRelease|x64'">
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>\\192.168.100.205\usera\$(SolutionName)\$(Configuration)\$(ProjectName)-$(Configuration)-$(PlatformTarget)-$(CharacterSet).exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>\\192.168.100.205\usera\$(SolutionName)\$(Configuration)\</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>192.168.100.205</RemoteDebuggerServerName>
+    <DeploymentDirectory>$(OutDirFullPath)</DeploymentDirectory>
+    <AdditionalFiles>C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.36.32532\x64\Microsoft.VC143.CRT\*.*</AdditionalFiles>
+  </PropertyGroup>
+</Project>
