@@ -63,7 +63,7 @@ public:
 		}
 	}
 	MemoryRental(const MemoryRental&) = delete;
-	MemoryRental(const MemoryRental&&)noexcept = delete;
+	explicit MemoryRental(const MemoryRental&&)noexcept = delete;
 	MemoryRental operator ()(const MemoryRental&) = delete;
 	MemoryRental operator =(const MemoryRental&) = delete;
 	~MemoryRental()

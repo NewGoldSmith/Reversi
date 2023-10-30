@@ -1,5 +1,5 @@
 /**
- * @file GameABMG.cpp
+ * @file GameABM4.cpp
  * @brief ゲームクラスの実装
  * @author Gold Smith
  * @date 2023
@@ -17,7 +17,7 @@ Game::Game():
 		if (!ptpp){
 			throw runtime_error(EOut);
 		}
-		SetThreadpoolThreadMaximum(ptpp, MAX_THREAD);
+		SetThreadpoolThreadMaximum(ptpp, MAX_THREADS);
 		return ptpp;
 		}()
 	,
@@ -118,14 +118,16 @@ Game::Game():
 		}
 
 		char next_player = pNode->player == 'X' ? 'C' : 'X';
-		vector<pair<int, int>> pairs = pNode->pGame->get_valid_moves(&pNode->board, next_player);
+		vector<pair<int, int>> pairs = move(pNode->pGame->get_valid_moves(&pNode->board, next_player));
 		if (pairs.empty()) {
 			next_player = next_player == 'X' ? 'C' : 'X';
-			pairs = pNode->pGame->get_valid_moves(&pNode->board, next_player);
+			pairs = move(pNode->pGame->get_valid_moves(&pNode->board, next_player));
 			if (pairs.empty()) {
 				// 勝敗確定
 				_D("勝敗確定 (" + to_string(pNode->row + 1) + "," + to_string(pNode->col + 1) + ")");
-				pNode->score = pNode->pGame->evaluate(&pNode->board,'C');
+				pNode->score = pNode->pGame->evaluateS(&pNode->board) > 0 ?
+					INF - (int)pNode->depth
+					: -INF + (int)pNode->depth;
 				pNode->pGame->return_minimax(pNode);
 				return;
 			}
@@ -133,7 +135,7 @@ Game::Game():
 
 		if ('C' == next_player) {
 
-			for (auto a_pair : pairs) {
+			for (const auto& a_pair : pairs) {
 				node_t* pNextNode = pNode->pGame->mr_Node.Lend();
 				pNode->pGame->copy_board(&pNextNode->board, &pNode->board);
 				pNode->pGame->update_board(&pNextNode->board, a_pair.first, a_pair.second, next_player);
@@ -141,7 +143,7 @@ Game::Game():
 				pNextNode->depth = pNode->depth + 1;
 				pNextNode->row=a_pair.first;
 				pNextNode->col=a_pair.second;
-				pNextNode->score = -INF;
+				pNode->score = -INF;
 				pNextNode->called_children_cnt = 0;
 				pNextNode->p_parent = pNode;
 				pNextNode->vp_child_nodes = {};
@@ -161,7 +163,7 @@ Game::Game():
 		}
 		else {
 
-			for (auto a_pair : pairs) {
+			for (const auto& a_pair : pairs) {
 				node_t* pNextNode = pNode->pGame->mr_Node.Lend();
 				pNode->pGame->copy_board(&pNextNode->board, &pNode->board);
 				pNode->pGame->update_board(&pNextNode->board, a_pair.first, a_pair.second, next_player);
@@ -169,7 +171,7 @@ Game::Game():
 				pNextNode->depth = pNode->depth + 1;
 				pNextNode->row=a_pair.first;
 				pNextNode->col=a_pair.second;
-				pNextNode->score = INF;
+				pNode->score = INF;
 				pNextNode->called_children_cnt = 0;
 				pNextNode->p_parent = pNode;
 				pNextNode->vp_child_nodes = {};
@@ -231,60 +233,59 @@ void Game::display_board()const
 }
 
 
-void Game::return_minimax( node_t* const p_child)
+void Game::return_minimax( node_t* const p_node)
 {
 	unique_ptr<CRITICAL_SECTION, decltype(LeaveCriticalSection)*> lock_child = {
-		[p_child]() {
-			EnterCriticalSection(&p_child->cs);
-			return &p_child->cs;
+		[p_node]() {
+			EnterCriticalSection(&p_node->cs);
+			return &p_node->cs;
 		}(),LeaveCriticalSection };
 
 	unique_ptr<CRITICAL_SECTION, decltype(LeaveCriticalSection)*> lock_parent = {
-	[p_child]() {
-		EnterCriticalSection(&p_child->p_parent->cs);
-		return &p_child->p_parent->cs;
+	[p_node]() {
+		EnterCriticalSection(&p_node->p_parent->cs);
+		return &p_node->p_parent->cs;
 		}(), LeaveCriticalSection
 	};
 
-	if (!p_child->p_parent->p_parent) {
-		_D("Turn:" + to_string(turn) + " return score to first node"
-			+ "(" + to_string(p_child->row + 1) + ","
-			+ to_string(p_child->col + 1) + "):" + to_string(p_child->score));
-		p_child->p_parent->called_children_cnt++;
+	if (!p_node->p_parent->p_parent) {
+		dout("Turn:" + to_string(turn) + " return score to first node"
+			+ "(" + to_string(p_node->row + 1) + ","
+			+ to_string(p_node->col + 1) + "):" + to_string(p_node->score));
+		p_node->p_parent->called_children_cnt++;
 
 		unique_ptr<CRITICAL_SECTION, decltype(LeaveCriticalSection)*> lock_game = {
 			[this]() {EnterCriticalSection(&cs); return &cs; }()
 			,LeaveCriticalSection };
 
-		if (best_val < p_child->score) {
-			_D("Turn:" + to_string(turn) + " update score" + "(" + to_string(p_child->row + 1) + ","
-				+ to_string(p_child->col + 1) + "):" + to_string(p_child->score));
-			best_val = p_child->score;
-			best_row = p_child->row;
-			best_col = p_child->col;
+		if (best_val <= p_node->score) {
+			dout(string() + __FILE__ + "(" + to_string(__LINE__) + "): "
+				+ "Turn:" + to_string(turn) + " update score" + "(" + to_string(p_node->row + 1) + ","
+				+ to_string(p_node->col + 1) + "):" + to_string(p_node->score));
+			best_val = p_node->score;
+			best_row = p_node->row;
+			best_col = p_node->col;
 		}
 
-		if (p_child->p_parent->called_children_cnt >= p_child->p_parent->vp_child_nodes.size()) {
-			SetEvent(p_child->pGame->hWaitEvent);
-		}
-		return;
-	}
-
-	p_child->p_parent->called_children_cnt++;
-
-	if ('C' == p_child->p_parent->player) {
-		p_child->p_parent->score = max<int>(p_child->p_parent->score, p_child->score);
-		if (p_child->p_parent->called_children_cnt >= p_child->p_parent->vp_child_nodes.size()) {
-			return_minimax(p_child->p_parent);
+		if (p_node->p_parent->called_children_cnt >= p_node->p_parent->vp_child_nodes.size()) {
+			SetEvent(p_node->pGame->hWaitEvent);
 		}
 		return;
 	}
-
+	p_node->p_parent->called_children_cnt++;
+	if (p_node->player == 'C') {
+		p_node->p_parent->score = max(p_node->p_parent->score, p_node->score);
+		if (p_node->p_parent->called_children_cnt >= p_node->p_parent->vp_child_nodes.size()) {
+			return_minimax(p_node->p_parent);
+		}
+		return;
+	}
 	else {
-		p_child->p_parent->score = min<int>(p_child->p_parent->score, p_child->score);
-		if (p_child->p_parent->called_children_cnt >= p_child->p_parent->vp_child_nodes.size()) {
-			return_minimax(p_child->p_parent);
+		p_node->p_parent->score = min(p_node->p_parent->score, p_node->score);
+		if (p_node->p_parent->called_children_cnt >= p_node->p_parent->vp_child_nodes.size()) {
+			return_minimax(p_node->p_parent);
 		}
+		return;
 	}
 }
 
@@ -294,7 +295,6 @@ void Game::node_cut(node_t* const p_node)
 		node_cut(p);
 	}
 	mr_Node.Return(p_node);
-
 }
 
 void Game::play_game(bool human_first, bool two_player)
@@ -331,12 +331,7 @@ void Game::play_game(bool human_first, bool two_player)
 				{
 					cout << "プレイヤー " << current_player
 						<< "パスになります。何かキーを押してください。" << endl;
-					string str;
-					getline(cin, str);
-					cin.clear();
-					cout << endl;
-					display_board();
-					cout << endl;
+					cin.get();
 					break;
 				}
 				cout << "プレイヤー " << current_player << "、入力して下さい(行 列)。";
@@ -539,16 +534,6 @@ int Game::get_count(const board_t* const p_board, const char player) const
 	return count;
 }
 
-int Game::both_count(const board_t* const p_board) const
-{
-	int count = 0;
-	for (int row = 0; row < N; row++)
-		for (int col = 0; col < N; col++)
-			if ((*p_board)[row][col] != ' ')
-				count++;
-	return count;
-}
-
 int Game::evaluate(const board_t* const p_board, char player)const
 {
 	// 評価値を計算
@@ -620,17 +605,17 @@ int Game::evaluateG(const board_t* const p_board, int depth) const
 	return cC - cX + AddScore;
 }
 
-//int Game::evaluateS(const board_t* const p_board) const
-//{
-//	// 評価値を計算
-//	return get_count(p_board, 'C') - get_count(p_board, 'X');
-//}
+int Game::evaluateS(const board_t* const p_board) const
+{
+	// 評価値を計算
+	return get_count(p_board, 'C') - get_count(p_board, 'X');
+}
 
 int Game::alphabeta(const board_t* const p_board, const char player, int depth, int alpha, int beta)const
 {
 	if (depth >= SECOND_DEPTH)
 	{
-		int score = evaluate(p_board,'C');
+		int score = evaluateS(p_board);
 		return score;
 	}
 
@@ -641,16 +626,16 @@ int Game::alphabeta(const board_t* const p_board, const char player, int depth, 
 		pairs = move(get_valid_moves(p_board, next_player));
 		if (pairs.empty()) {
 			_D("勝敗確定");
-			return evaluate(p_board,'C') > 0 ? INF - depth : -INF + depth;
+			return evaluateS(p_board) > 0 ? INF - (int)depth : -INF + (int)depth;
 		}
 	}
 
 	if ('C' == next_player) {
-		for (auto a_pair : pairs) {
+		for (const auto& a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
-			alpha = max<int>(alpha, alphabeta(&next_board, next_player, depth + 1, alpha, beta));
+			alpha = std::max(alpha, alphabeta(&next_board, next_player, depth + 1, alpha, beta));
 			if (alpha >= beta) {
 				//_D("alpha cut");
 				break;
@@ -659,11 +644,11 @@ int Game::alphabeta(const board_t* const p_board, const char player, int depth, 
 		return alpha;
 	}
 	else {
-		for (auto a_pair : pairs) {
+		for (const auto& a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
-			beta = min<int>(beta, alphabeta(&next_board, next_player, depth + 1, alpha, beta));
+			beta = std::min(beta, alphabeta(&next_board, next_player, depth + 1, alpha, beta));
 			if (alpha >= beta) {
 				//_D("beta cut");
 				break;
@@ -677,38 +662,38 @@ int Game::minimax(const board_t* const p_board, const char player, int depth)con
 {
 	if (depth >= MAX_DEPTH)
 	{
-		int score = evaluate(p_board,'C');
+		int score = evaluateS(p_board);
 		return score;
 	}
 
 	char next_player = player == 'X' ? 'C' : 'X';
-	vector<pair<int, int>> pairs = get_valid_moves(p_board, next_player);
+	vector<pair<int, int>> pairs = move(get_valid_moves(p_board, next_player));
 	if (pairs.empty()) {
 		next_player = next_player == 'X' ? 'C' : 'X';
-		pairs = get_valid_moves(&board, next_player);
+		pairs = move(get_valid_moves(p_board, next_player));
 		if (pairs.empty()) {
 			_D("勝敗確定");
-			return evaluate(p_board,'C') > 0 ? INF - depth : -INF + depth;
+			return evaluateS(p_board) > 0 ? INF - depth : -INF + depth;
 		}
 	}
 
 	if ('C' == next_player) {
 		int score = -INF;
-		for (auto a_pair : pairs) {
+		for (const auto& a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
-			score = max<int>(score, minimax(&next_board, next_player, depth + 1 ));
+			score = max(score, minimax(&next_board, next_player, depth + 1));
 		}
 		return score;
 	}
 	else {
 		int score = INF;
-		for (auto a_pair : pairs) {
+		for (const auto& a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
-			score = min<int>(score, minimax(&next_board, next_player, depth + 1));
+			score = min(score, minimax(&next_board, next_player, depth + 1));
 		}
 		return score;
 	}
@@ -779,13 +764,9 @@ bool Game::make_computer_move(pair<int, int>* p_pair)
 #if defined(_DEBUG)
 	// 有効な選択肢が選択されたかチェック
 	stringstream ss;
-	if (find(v_pairs.begin(), v_pairs.end(), pair<int,int>(best_row,best_col)) != v_pairs.end()) {
-		//_D(string("Pair found in vector v_pairs: (")
-		//	+ to_string( best_row)+ "," +to_string( best_col)+ ")");
-	}
-	else {
+	if (find(v_pairs.begin(), v_pairs.end(), pair<int, int>(best_row, best_col)) == v_pairs.end()) {
 		_D(string("Pair not found in vector v_pairs: (")
-			+to_string( best_row)+ ", " + to_string( best_col)+ ")");
+			+ to_string(best_row) + ", " + to_string(best_col) + ")");
 		MessageBoxA(NULL, ss.str().c_str(), "検証", MB_ICONEXCLAMATION);
 	}
 #endif // _DEBUG

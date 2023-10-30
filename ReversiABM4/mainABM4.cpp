@@ -1,5 +1,5 @@
 ﻿/**
- * @file mainABMG.cpp
+ * @file mainABM4.cpp
  * @brief メインの実装
  * @author Gold Smith
  * @date 2023
@@ -14,6 +14,20 @@ using namespace std;
 
 int main()
 {
+	cout << R"(/**
+ * @file )" << _STRINGIZE(APPNAME)R"(
+ * @brief Reversi. AlphaBeta. Multi thread. 4th.
+ * @author Gold Smith
+ * @date 2023
+ *
+ * Released under the MIT license
+ * https: //opensource.org/licenses/mit-license.php
+ */
+)" << endl;
+	
+	cout<< "threads:" << to_string(MAX_THREADS) << " depth:" << to_string(MAX_DEPTH)
+		<< endl << endl;
+
 	try{
 		while (true) {
 			// コンピュータ対戦の処理

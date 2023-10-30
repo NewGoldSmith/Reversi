@@ -24,11 +24,16 @@ using namespace std;
 constexpr int N = 8;
 constexpr int INF = 10000;
 constexpr int BREAK_CODE = INF + 5;
-constexpr int FIRST_DEPTH = 1;
-constexpr int SECOND_DEPTH =10;
+#define FIRST_DEPTH  2U// 1以上に設定要。
+#define SECOND_DEPTH 8U
 constexpr int MAX_DEPTH = FIRST_DEPTH + SECOND_DEPTH;
-constexpr unsigned MAX_THREAD = 1;
+constexpr unsigned MAX_THREADS = 1;
 constexpr unsigned NODE_UNIT_SIZE = 0x1000;
+#if (FIRST_DEPTH < 1 ) 
+#error FIRST_DEPTH must be 1 or greater.
+#endif
+
+
 void dout(const string& str);
 #if defined(_DEBUG)
 #define _D(str) dout(string()+__FILE__+"("+to_string(__LINE__)+"): "+str);
@@ -89,7 +94,6 @@ class Game
 		bool operator == (const node_t&)const = delete;
 	};
 
-	void return_minimax(node_t* const p_child);
 	void node_cut(node_t* const p_node);
 
 	const unique_ptr<node_t,void(*)(node_t[])>node_array;
@@ -172,7 +176,6 @@ private:
 	///// <returns>std::pair型のスコア。first Xの数。second Cの数。</returns>
 	//pair<int, int> get_each_countXC(const board_t* const p_board)const;
 	int get_count(const board_t* const p_board,const char player)const;
-	int both_count(const board_t* const p_board)const;
 	/// <summary>
 	/// 評価関数
 	/// </summary>
@@ -182,10 +185,12 @@ private:
 	/// <returns>評価値</returns>
 	int evaluate(const board_t* const  p_board, char ch)const;
 	int evaluateG(const board_t* const p_board, int depth) const;
+	int evaluateS(const board_t* const p_board) const;
 	//int evaluateG(const board_t* const  p_board, int depth)const;
 	//int evaluateS(const board_t* const  p_board)const;
 	int alphabeta(const board_t* const p_board, const char player, int depth, int alpha, int beta)const;
 	int minimax(const board_t* const p_poard, const char player, int depth)const;
+	void return_minimax(node_t* const p_child);
 	/// <summary>
 	/// コンピュータが一手指す。成功ならp_pairの指す所にその座標を入れる。
 	/// 失敗ならp_pairの指す内容は不定。
