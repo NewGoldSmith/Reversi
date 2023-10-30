@@ -114,18 +114,20 @@ Game::Game():
 		if (pNode->depth >= FIRST_DEPTH)
 		{
 #ifdef _DEBUG
-			//int scoreb=pNode->pGame->minimax(&pNode->board, pNode->player, 0);
 			int scoreb = pNode->pGame->
 				minimax_bb(pNode->bb_X, pNode->bb_C, pNode->player, 0);
 #endif // _DEBUG
+
 			pNode->score= pNode->pGame->
 				alphabeta_bb(pNode->bb_X, pNode->bb_C, pNode->player, 0, -INF, INF);
+
 #ifdef _DEBUG
 			if (pNode->score != scoreb) {
 				MessageBoxA(NULL, "スコアが違います。", "検証", MB_ICONEXCLAMATION);
 				int i = 0;
 			}
-#endif // _DEBUG_
+#endif // _DEBUG
+
 			pNode->pGame->return_minimax(pNode);
 			return;
 		}
@@ -139,8 +141,6 @@ Game::Game():
 			if (pairs.empty()) {
 				// 勝敗確定
 				_D("勝敗確定 (" + to_string(pNode->row + 1) + "," + to_string(pNode->col + 1) + ")");
-				//pNode->score = pNode->pGame->evaluate_bbG(
-				//	pNode->bb_X, pNode->bb_C, pNode->player, pNode->depth + 1);
 				pNode->score = pNode->pGame->
 					evaluate_bbS(pNode->bb_X, pNode->bb_C) > 0 ?
 					INF - (int)pNode->depth
@@ -157,8 +157,10 @@ Game::Game():
 				pNode->pGame->update_board_bb(pNextNode->bb_X, pNextNode->bb_C
 					, pNode->bb_X, pNode->bb_C
 					, a_pair.first, a_pair.second, next_player);
+#ifdef _DEBUG
 				pNextNode->pGame->conv_bbToBoard(&pNextNode->board
 					, pNextNode->bb_X, pNextNode->bb_C);
+#endif // _DEBUG
 				pNextNode->player = next_player;
 				pNextNode->depth = pNode->depth + 1;
 				pNextNode->row = a_pair.first;
@@ -189,8 +191,10 @@ Game::Game():
 				pNode->pGame->update_board_bb(pNextNode->bb_X, pNextNode->bb_C
 					, pNode->bb_X, pNode->bb_C, a_pair.first, a_pair.second
 					, next_player);
+#ifdef _DEBUG
 				pNextNode->pGame->conv_bbToBoard(&pNextNode->board
 					, pNextNode->bb_X, pNextNode->bb_C);
+#endif // _DEBUG
 				pNextNode->player = next_player;
 				pNextNode->depth = pNode->depth + 1;
 				pNextNode->row = a_pair.first;
@@ -220,7 +224,6 @@ Game::Game():
 {
 	init_game_bb();
 	init_shift_table();
-	//init_game();
 	mr_Node.DebugString("mr_Node");
 }
 
@@ -253,6 +256,7 @@ void Game::init_game()
 	board[N / 2][N / 2 - 1] = 'C';
 	board[N / 2][N / 2] = 'X';
 }
+
 void Game::display_board_bb(const bb_t bbX, const bb_t bbC) const
 {
 	std::cout << " ";
@@ -322,7 +326,6 @@ void Game::return_minimax( node_t* const p_node)
 		}
 		return;
 	}
-
 	p_node->p_parent->called_children_cnt++;
 	if (p_node->player == 'C') {
 		p_node->p_parent->score = max(p_node->p_parent->score, p_node->score);
@@ -346,7 +349,6 @@ void Game::node_cut(node_t* const p_node)
 		node_cut(p);
 	}
 	mr_Node.Return(p_node);
-
 }
 
 void Game::play_game(bool human_first, bool two_player)
@@ -362,11 +364,13 @@ void Game::play_game(bool human_first, bool two_player)
 		if (current_player == 'C' && !two_player) {
 			pair<int, int> p;
 			QueryPerformanceCounter(&StartingTime);
-			if (make_computer_move_bb(&p))
+			if (make_computer_move_bb(&p)) {
 				cout << "コンピュータが" << to_string(p.first + 1)
-				<< " " << to_string(p.second + 1) << "を指しました。" << endl;
-			else
+					<< " " << to_string(p.second + 1) << "を指しました。" << endl;
+			}
+			else {
 				cout << "コンピュータはパスしました。" << endl;
+			}
 			QueryPerformanceCounter(&EndingTime);
 			ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
 			ElapsedMicroseconds.QuadPart *= 1000000;
@@ -383,12 +387,7 @@ void Game::play_game(bool human_first, bool two_player)
 				{
 					cout << "プレイヤー " << current_player
 						<< "パスになります。何かキーを押してください。" << endl;
-					string str;
-					getline(cin, str);
-					cin.clear();
-					cout << endl;
-					display_board_bb(bb_cur_X, bb_cur_C);
-					cout << endl;
+					cin.get();
 					break;
 				}
 				cout << "プレイヤー " << current_player
@@ -410,7 +409,7 @@ void Game::play_game(bool human_first, bool two_player)
 					display_board_bb(bb_cur_X, bb_cur_C);
 					continue;
 				}
-				if ((bb_cur_X | bb_cur_C) & (0x8000000000000000 >> ((row-1) * N + col-1))) {
+				if ((bb_cur_X | bb_cur_C) & (0x8000000000000000 >> ((row - 1) * N + col - 1))) {
 					cout << "そのマスは既に選択されています。" << endl;
 					display_board_bb(bb_cur_X, bb_cur_C);
 					continue;
@@ -421,7 +420,6 @@ void Game::play_game(bool human_first, bool two_player)
 					display_board_bb(bb_cur_X, bb_cur_C);
 					continue;
 				}
-
 				update_board_bb(bb_cur_X, bb_cur_C, bb_cur_X, bb_cur_C, row - 1, col - 1, current_player);
 				break;
 			}
@@ -487,7 +485,7 @@ bool Game::is_valid_move_bb(
 	, const bb_t src_C
 	, const int row
 	, const int col
-	, const char player)const
+	, const char player)const noexcept
 {
 	// (row, col)が盤面の範囲外の場合はfalseを返す
 	if (row < 0 || row >= N || col < 0 || col >= N)
@@ -524,7 +522,7 @@ bool Game::is_valid_move_bb(
 	return false;
 }
 
-inline bool Game::is_valid_move(const board_t* const p_board, int row, int col, char player)const
+bool Game::is_valid_move(const board_t* const p_board, int row, int col, char player)const
 {
 	// (row, col)が盤面の範囲外の場合はfalseを返す
 	if (row < 0 || row >= N || col < 0 || col >= N)
@@ -564,20 +562,6 @@ get_valid_moves_bb(const bb_t bb_X, const bb_t bb_C, const char player)const
 	// リバーシのルールに基づいて、次に打てる手を探索
 	for (int row = 0; row < N; row++) {
 		for (int col = 0; col < N; col++) {
-#if defined(_DEBUG)
-			//bool bbv = is_valid_move_bb(bb_X, bb_C, row, col, player);
-			//board_t bo;
-			//conv_bbToBoard(&bo, bb_X, bb_C);
-			//if (!is_equal(&bo, bb_X, bb_C)) {
-			//	MessageBoxA(NULL, "NotEqual", "確認", MB_ICONEXCLAMATION);
-			//	int i = 0;
-			//}
-			//bool bov = is_valid_move(&bo, row, col, player);
-			//if (bbv != bov) {
-			//	MessageBoxA(NULL, "NotEqualValid", "確認", MB_ICONEXCLAMATION);
-			//	int i = 0;
-			//}
-#endif // _DEBUG
 			if (is_valid_move_bb(bb_X, bb_C, row, col, player)) {
 				valid_moves.emplace_back(row, col);
 			}
@@ -586,7 +570,7 @@ get_valid_moves_bb(const bb_t bb_X, const bb_t bb_C, const char player)const
 	return valid_moves;
 }
 
-inline vector<pair<int, int>> Game::
+vector<pair<int, int>> Game::
 get_valid_moves(const board_t* const p_board, const char ch)const
 {
 	vector<pair<int, int>> valid_moves;
@@ -659,7 +643,7 @@ void Game::update_board_bb(
 	, _In_ const bb_t src_C
 	, _In_ const int row
 	, _In_ const int col
-	, _In_ const char player) const
+	, _In_ const char player) const noexcept
 {
 	// 駒を置く
 	const bb_t place = 0x8000000000000000ULL >> (row * N + col);
@@ -673,7 +657,7 @@ void Game::update_board_bb(
 	}
 
 	// リバーシのルールに基づいて、盤面を更新
-	constexpr Direction shift_direction[8] = { UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN, LEFT_DOWN, LEFT, LEFT_UP };
+//	constexpr Direction shift_direction[8] = { UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN, LEFT_DOWN, LEFT, LEFT_UP };
 	bb_t player_board = (player == 'X') ? dst_X : dst_C;
 	bb_t opponent_board = (player == 'X') ? dst_C : dst_X;
 
@@ -715,46 +699,6 @@ void Game::update_board_bb(
 		}
 	}
 }
-
-
-//inline void Game::update_board_bb(bb_t& bb_X, bb_t& bb_C, int row, int col, char ch)const
-//{
-//	// 駒を置く
-//	if (ch == 'X') {
-//		bb_X |= (1ULL << (row * N + col));
-//	}
-//	else {
-//		bb_C |= (1ULL << (row * N + col));
-//	}
-//
-//	// リバーシのルールに基づいて、盤面を更新
-//	const int dx[] = { -1, -1, -1, 0, 1, 1, 1, 0 };
-//	const int dy[] = { -1, 0, 1, 1, 1, 0, -1, -1 };
-//	bb_t& bb_player = ch == 'X' ? bb_X : bb_C;
-//	bb_t& bb_opponent = ch == 'X' ? bb_C : bb_X;
-//
-//	for (int dir = 0; dir < 8; dir++) {
-//		int x = row + dx[dir];
-//		int y = col + dy[dir];
-//		bool found_opponent = false;
-//
-//		while (x >= 0 && x < N && y >= 0 && y < N && (bb_opponent & (1ULL << (x * N + y)))) {
-//			found_opponent = true;
-//			x += dx[dir];
-//			y += dy[dir];
-//		}
-//		if (found_opponent && x >= 0 && x < N && y >= 0 && y < N && (bb_player & (1ULL << (x * N + y)))) {
-//			x -= dx[dir];
-//			y -= dy[dir];
-//			while (x != row || y != col) {
-//				bb_player |= (1ULL << (x * N + y));
-//				bb_opponent &= ~(1ULL << (x * N + y));
-//				x -= dx[dir];
-//				y -= dy[dir];
-//			}
-//		}
-//	}
-//}
 
 void Game::update_board(board_t* const p_board, const int row, const int col, const char ch)const
 {
@@ -923,10 +867,16 @@ int Game::evaluate_bbG(const bb_t bb_X, const bb_t bb_C, const char player,const
 	//return countC - countX + AddScore;
 }
 
-inline int Game::evaluate_bbS(const bb_t bb_X, const bb_t bb_C) const
+int Game::evaluate_bbS(const bb_t bb_X, const bb_t bb_C) const noexcept
 {
 	// 評価値を計算
 	return (int)__popcnt64(bb_C) - (int)__popcnt64(bb_X);
+}
+
+int Game::evaluateS(const board_t* const p_board) const
+{
+	// 評価値を計算
+	return get_count(p_board, 'C') - get_count(p_board, 'X');
 }
 
 int Game::alphabeta_bb(
@@ -967,7 +917,7 @@ int Game::alphabeta_bb(
 		return alpha;
 	}
 	else {
-		for (const auto &a_pair : pairs) {
+		for (const auto& a_pair : pairs) {
 			bb_t next_bb_X;
 			bb_t next_bb_C;
 			update_board_bb(next_bb_X, next_bb_C, bb_X, bb_C, a_pair.first, a_pair.second, next_player);
@@ -989,7 +939,7 @@ int Game::alphabeta(
 {
 	if (depth >= MAX_DEPTH)
 	{
-		int score = evaluate(p_board, 'C');
+		int score = evaluateS(p_board);
 		return score;
 	}
 
@@ -1000,7 +950,7 @@ int Game::alphabeta(
 		pairs = move(get_valid_moves(p_board, next_player));
 		if (pairs.empty()) {
 			_D("勝敗確定");
-			return evaluate(p_board, 'C') > 0 ? INF - (int)depth : -INF + (int)depth;
+			return evaluateS(p_board) > 0 ? INF - (int)depth : -INF + (int)depth;
 		}
 	}
 
@@ -1038,39 +988,39 @@ int Game::minimax(const board_t* const p_board, const char player, int depth)con
 {
 	if (depth >= SECOND_DEPTH)
 	{
-		int score = evaluate(p_board, 'C');
+		int score = evaluateS(p_board);
 		return score;
 	}
 
 	char next_player = player == 'X' ? 'C' : 'X';
-	vector<pair<int, int>> pairs = get_valid_moves(p_board, next_player);
+	vector<pair<int, int>> pairs = move(get_valid_moves(p_board, next_player));
 	if (pairs.empty()) {
 		next_player = next_player == 'X' ? 'C' : 'X';
-		pairs = get_valid_moves(p_board, next_player);
+		pairs = move(get_valid_moves(p_board, next_player));
 		if (pairs.empty()) {
 			_D("勝敗確定");
-			int score = evaluate(p_board, 'C') > 0 ? INF - (int)depth : -INF + (int)depth;
+			int score = evaluateS(p_board) > 0 ? INF - (int)depth : -INF + (int)depth;
 			return score;
 		}
 	}
 
 	if ('C' == next_player) {
 		int score = -INF;
-		for (auto a_pair : pairs) {
+		for (const auto& a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
-			score = max<int>(score, minimax(&next_board, next_player, depth + 1));
+			score = std::max(score, minimax(&next_board, next_player, depth + 1));
 		}
 		return score;
 	}
 	else {
 		int score = INF;
-		for (auto a_pair : pairs) {
+		for (const auto& a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
-			score = min<int>(score, minimax(&next_board, next_player, depth + 1));
+			score = std::min(score, minimax(&next_board, next_player, depth + 1));
 		}
 		return score;
 	}
@@ -1085,13 +1035,13 @@ int Game::minimax_conf(const board_t* const p_board, const char player, int dept
 	}
 
 	char next_player = player == 'X' ? 'C' : 'X';
-	vector<pair<int, int>> pairs = get_valid_moves(p_board, next_player);
+	vector<pair<int, int>> pairs = move(get_valid_moves(p_board, next_player));
 	if (pairs.empty()) {
 		next_player = next_player == 'X' ? 'C' : 'X';
-		pairs = get_valid_moves(p_board, next_player);
+		pairs = move(get_valid_moves(p_board, next_player));
 		if (pairs.empty()) {
 			_D("勝敗確定");
-			return evaluate(p_board, 'C') > 0 ? 
+			return evaluateS(p_board) > 0 ?
 				INF - (depth - FIRST_DEPTH)
 				: -INF + (depth - FIRST_DEPTH);
 		}
@@ -1099,21 +1049,21 @@ int Game::minimax_conf(const board_t* const p_board, const char player, int dept
 
 	if ('C' == next_player) {
 		int score = -INF;
-		for (auto a_pair : pairs) {
+		for (const auto& a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
-			score = max<int>(score, minimax_conf(&next_board, next_player, depth + 1));
+			score = std::max(score, minimax_conf(&next_board, next_player, depth + 1));
 		}
 		return score;
 	}
 	else {
 		int score = INF;
-		for (auto a_pair : pairs) {
+		for (const auto& a_pair : pairs) {
 			board_t next_board{};
 			copy_board(&next_board, p_board);
 			update_board(&next_board, a_pair.first, a_pair.second, next_player);
-			score = min<int>(score, minimax_conf(&next_board, next_player, depth + 1));
+			score = std::min(score, minimax_conf(&next_board, next_player, depth + 1));
 		}
 		return score;
 	}
@@ -1128,10 +1078,10 @@ int Game::minimax_bb(const bb_t bb_X, const bb_t bb_C, const char player, const 
 	}
 
 	char next_player = player == 'X' ? 'C' : 'X';
-	vector<pair<int, int>> pairs = get_valid_moves_bb(bb_X, bb_C, next_player);
+	vector<pair<int, int>> pairs = move(get_valid_moves_bb(bb_X, bb_C, next_player));
 	if (pairs.empty()) {
 		next_player = next_player == 'X' ? 'C' : 'X';
-		pairs = get_valid_moves_bb(bb_X, bb_C, next_player);
+		pairs = move(get_valid_moves_bb(bb_X, bb_C, next_player));
 		if (pairs.empty()) {
 			_D("勝敗確定");
 			return evaluate_bbS(bb_X, bb_C) > 0 ? INF - (int)depth : -INF + (int)depth;
@@ -1171,10 +1121,10 @@ int Game::minimax_bb_conf(const bb_t bb_X, const bb_t bb_C, const char player, c
 	}
 
 	char next_player = player == 'X' ? 'C' : 'X';
-	vector<pair<int, int>> pairs = get_valid_moves_bb(bb_X, bb_C, next_player);
+	vector<pair<int, int>> pairs = move(get_valid_moves_bb(bb_X, bb_C, next_player));
 	if (pairs.empty()) {
 		next_player = next_player == 'X' ? 'C' : 'X';
-		pairs = get_valid_moves_bb(bb_X, bb_C, next_player);
+		pairs = move(get_valid_moves_bb(bb_X, bb_C, next_player));
 		if (pairs.empty()) {
 			_D("勝敗確定");
 			return evaluate_bbS(bb_X, bb_C) > 0 ?
@@ -1244,7 +1194,9 @@ bool Game::make_computer_move_bb(pair<int, int>* p_pair)
 
 		node_t* pNode = mr_Node.Lend();
 		update_board_bb(pNode->bb_X, pNode->bb_C, bb_cur_X, bb_cur_C, v_pairs[i].first, v_pairs[i].second, 'C');
+#ifdef _DEBUG
 		conv_bbToBoard(&pNode->board, pNode->bb_X, pNode->bb_C);
+#endif // _DEBUG
 		pNode->player = 'C';
 		pNode->depth = p_root_node->depth + 1;
 		pNode->row = v_pairs[i].first;
@@ -1275,8 +1227,8 @@ bool Game::make_computer_move_bb(pair<int, int>* p_pair)
 	}
 
 	EnterCriticalSection(&cs);
-#if defined(_DEBUG)
 
+#ifdef _DEBUG
 	board_t bmn;
 	conv_bbToBoard(&bmn, bb_cur_X, bb_cur_C);
 	int score_minimax = minimax_conf(&bmn, 'X', 0);
@@ -1287,31 +1239,14 @@ bool Game::make_computer_move_bb(pair<int, int>* p_pair)
 	}
 
 	// 有効な選択肢が選択されたかチェック
-	stringstream ss;
-	if (find(v_pairs.begin(), v_pairs.end(), pair<int, int>(best_row, best_col)) != v_pairs.end()) {
-		//_D(string("Pair found in vector v_pairs: (")
-		//  + to_string( best_row)+ "," +to_string( best_col)+ ")");
-	}
-	else {
+	if (find(v_pairs.begin(), v_pairs.end(), pair<int, int>(best_row, best_col)) == v_pairs.end()) {
 		_D(string("Pair not found in vector v_pairs: (")
 			+ to_string(best_row) + ", " + to_string(best_col) + ")");
-		MessageBoxA(NULL, ss.str().c_str(), "検証", MB_ICONEXCLAMATION);
+		MessageBoxA(NULL, "コンピューターは無効な手を選択しました。", "検証", MB_ICONEXCLAMATION);
 	}
-
-// ボード整合性チェック
-	board_t board_check;
-	conv_bbToBoard(&board_check, bb_cur_X, bb_cur_C);
-	update_board(&board_check, best_row, best_col, 'C');
 #endif // _DEBUG
 
 	update_board_bb(bb_cur_X, bb_cur_C, bb_cur_X, bb_cur_C, best_row, best_col, 'C');
-
-#if defined(_DEBUG)
-	if (!is_equal(&board_check, bb_cur_X, bb_cur_C)) {
-		MessageBoxA(NULL, "ボード整合性チェック", "確認", MB_ICONEXCLAMATION);
-	}
-#endif // _DEBUG
-
 	*p_pair = { best_row, best_col };
 	LeaveCriticalSection(&cs);
 

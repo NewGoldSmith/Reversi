@@ -15,6 +15,7 @@
 #error "This code must be compiled in x64 configuration."
 #endif
 #include<Windows.h>
+#include<sysinfoapi.h>
 #include<string>
 #include<iostream>
 #include<sstream>
@@ -32,7 +33,7 @@ constexpr int N = 8;
 constexpr int INF = 10000;
 constexpr int BREAK_CODE = INF + 5;
 #define FIRST_DEPTH  2U// 1以上に設定要。
-#define SECOND_DEPTH 2U
+#define SECOND_DEPTH 8U
 constexpr int MAX_DEPTH = FIRST_DEPTH + SECOND_DEPTH;
 constexpr unsigned MAX_THREADS = 1;
 constexpr unsigned NODE_UNIT_SIZE = 0x20000;
@@ -196,7 +197,7 @@ private:
 	/// <param name="col">列</param>
 	/// <param name="ch">手番</param>
 	/// <returns>有効ならtrue、無効ならfalseを返す。</returns>
-	bool is_valid_move_bb(const bb_t src_X, const bb_t src_C, const int row, const int col, const char player)const;
+	bool is_valid_move_bb(const bb_t src_X, const bb_t src_C, const int row, const int col, const char player)const noexcept;
 	bool is_valid_move(const board_t* const p_board, int row, int col, char ch)const;
 	/// <summary>
 	/// 有効な指し手全てを探し、vectorで返す。firstが行、secondが列。
@@ -205,7 +206,7 @@ private:
 	/// <param name="ch">対象のプレイヤー。</param>
 	/// <returns>pairのvector。</returns>
 	vector<pair<int, int>> get_valid_moves_bb(const bb_t bb_X, const bb_t bb_C, const char player)const;
-	inline vector<pair<int, int>> get_valid_moves(const board_t* const p_board, const char ch)const;
+	vector<pair<int, int>> get_valid_moves(const board_t* const p_board, const char ch)const;
 	bool existing_valid_moves_bb(const bb_t bb_X, const bb_t bb_C, const char player) const;
 	
 	/// <summary>
@@ -215,8 +216,7 @@ private:
 	/// <param name="row">指定する指し手の行。</param>
 	/// <param name="col">指定する指し手の列。</param>
 	/// <param name="ch">手番のプレイヤー</param>
-	void update_board_bb(_Inout_ bb_t& dst_X, _Inout_ bb_t& dst_C, _In_ const bb_t src_X, _In_ const bb_t src_C, _In_ const int row, _In_ const int col, _In_ const char player) const;
-	//inline void update_board_bb(bb_t& p_board_X, bb_t& p_board_C, int row, int col, char ch)const;
+	void update_board_bb(_Inout_ bb_t& dst_X, _Inout_ bb_t& dst_C, _In_ const bb_t src_X, _In_ const bb_t src_C, _In_ const int row, _In_ const int col, _In_ const char player) const noexcept;
 	void update_board(board_t* const p_board, const int row, const int col, const char ch)const;
 	/// <summary>
 	/// ボードをコピーする。
@@ -248,7 +248,8 @@ private:
 	/// <returns>評価値</returns>
 	int evaluate_bbG(const bb_t bb_X, const bb_t bb_C, const char player, const depth_t depth)  const;
 	int evaluate(const board_t* const  p_board, char ch)const;
-	inline int evaluate_bbS(const bb_t bb_X, const bb_t bb_C) const;
+	int evaluate_bbS(const bb_t bb_X, const bb_t bb_C) const noexcept;
+	int evaluateS(const board_t* const p_board) const;
 	//int evaluateG(board_t board_X, board_t board_C, depth_t depth)const;
 	//int evaluateS(board_t board_X, board_t board_C)const;
 	/// <summary>
