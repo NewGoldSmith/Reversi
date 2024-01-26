@@ -9,18 +9,23 @@
 #define PCH_H
 
 #define NOMINMAX
-// プリコンパイルするヘッダーをここに追加します
-#include <windows.h>
-#include <string>
-//#include <windef.h>
-#include <vector>
 #include <debugapi.h>
+#include <string>
+#include <windows.h>
+#include<conio.h>
+#include <iomanip>
+#include <vector>
+#include <algorithm>
+#include <iosfwd>
+#include <limits>
 #include <sstream>
-#include "framework.h"
 #include < immintrin.h >
 #include <cstdint>
 #include <emmintrin.h>
 #include <iostream>
 #include <xmmintrin.h>
+#include "../Engine/Engine8.h"
 #include "../Debug_fnc/debug_fnc.h"
+#include "../BitManip/bit_manip.h"
+#include "../BitManip/bit_manip_okuhara.h"
 #endif //PCH_H
