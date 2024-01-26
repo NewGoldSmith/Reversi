@@ -19,7 +19,6 @@
 // ******èåèê›íËèIÇÌÇË*************
 
 #ifdef USING_DEBUG_STRING
-#define NOMINMAX
 #include <Windows.h>
 #include < algorithm >
 #include <string>
@@ -31,7 +30,6 @@
 
 
 #include <exception>
-#include <atomic>
 #include <iostream>
 #include <sstream>
 
@@ -239,6 +237,5 @@ protected:
 #endif // CONFIRM_POINT
 
 #ifdef USING_DEBUG_STRING
-#undef NOMINMAX
 #undef USING_DEBUG_STRING
 #endif // USING_DEBUG_STRING
