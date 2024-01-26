@@ -36,12 +36,12 @@ namespace ReversiEngine
 		Engine8& operator=(const Engine8&) = delete;
 		bool operator==(const Engine8&) const = delete;
 		bool search(__m256i board
-			, HANDLE hEndEvent
+			, HANDLE hEvWait
 			, uint16_t max_depth = 1
 			, uint16_t first_depth = 1
 			, uint64_t num_array = 0x2000);
 		uint64_t await_best_move();
-		__m256i __vectorcall change_turn_m(const __m256i m)const;
+		__m256i __vectorcall make_next_turn_m(const __m256i m)const;
 		/// <summary>
 		/// 盤面のデータを保持する__m256iの頭出し用。
 		/// サフィックスの数字は使用するビット幅。
@@ -66,10 +66,10 @@ namespace ReversiEngine
 		//const PTP_CLEANUP_GROUP_CANCEL_CALLBACK pfng{};
 		const std::unique_ptr< CRITICAL_SECTION
 			, decltype(DeleteCriticalSection)*> pcs;
-		node_t* p_node_array;
-		MemoryRental<node_t>* p_mr_Node;
-		uint64_t num_array;
-		HANDLE hWaitEvent = NULL;
+		node_t* p_node_array{};
+		MemoryRental<node_t>* p_mr_Node{};
+		uint64_t num_array{};
+		HANDLE hEvWait = NULL;
 		__m256i m_board{};
 		uint16_t first_depth{};
 		uint16_t second_depth{};

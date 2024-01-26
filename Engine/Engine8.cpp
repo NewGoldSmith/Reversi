@@ -52,10 +52,10 @@ ReversiEngine::Engine8::Engine8(PTP_POOL const ptpp, PTP_CALLBACK_ENVIRON const 
 			return;
 		}
 
-		__m256i next_board = pNode->pEngine->change_turn_m(pNode->m_board);
+		__m256i next_board = pNode->pEngine->make_next_turn_m(pNode->m_board);
 		next_board = okuhara::get_moves256(next_board);
 		if (!next_board.m256i_u64[mIndex::BB_M64]) {
-			next_board = pNode->pEngine->change_turn_m(next_board);
+			next_board = pNode->pEngine->make_next_turn_m(next_board);
 			next_board = okuhara::get_moves256(next_board);
 			if (!next_board.m256i_u64[mIndex::BB_M64]) {
 				// èüîsämíË
@@ -118,13 +118,13 @@ ReversiEngine::Engine8::~Engine8()
 
 bool ReversiEngine::Engine8::search(
 	__m256i board
-	, HANDLE hEndEvent
+	, HANDLE hEvWait
 	, uint16_t max_depth
 	, uint16_t first_depth
 	,uint64_t num_array)
 {
-	if (!(hWaitEvent = hEndEvent)) {
-		throw std::invalid_argument("hEndEvent is NULL.");
+	if (!(this->hEvWait = hEvWait)) {
+		throw std::invalid_argument("hEvWait is NULL.");
 	}
 	if ((max_depth - first_depth) < 0) {
 		throw std::invalid_argument("max_depth - first_depth is invalid.");
@@ -135,7 +135,7 @@ bool ReversiEngine::Engine8::search(
 	}
 	uint64_t moves = okuhara::get_moves256(board).m256i_u64[mIndex::BB_M64];
 	if (!moves) {
-		SetEvent(hEndEvent);
+		SetEvent(hEvWait);
 		return 0;
 	}
 
@@ -190,7 +190,7 @@ bool ReversiEngine::Engine8::search(
 
 uint64_t ReversiEngine::Engine8::await_best_move()
 {
-	::WaitForSingleObject(hWaitEvent, INFINITE);
+	::WaitForSingleObject(hEvWait, INFINITE);
 	unique_ptr<CRITICAL_SECTION, decltype(LeaveCriticalSection)*> lock_engine = 
 	{[this]() {EnterCriticalSection(&cs);return &cs;}(), LeaveCriticalSection};
 	return best_move;
@@ -206,7 +206,7 @@ void ReversiEngine::Engine8::node_cut(node_t* const p_node)
 	p_mr_Node->Return(p_node);
 }
 
-__m256i __vectorcall ReversiEngine::Engine8::change_turn_m(const __m256i m)const
+__m256i __vectorcall ReversiEngine::Engine8::make_next_turn_m(const __m256i m)const
 {
 	__m256i tmp = _mm256_permute4x64_epi64(m, _MM_SHUFFLE(3, 2, 0, 1));
 	tmp.m256i_u8[mIndex::ST1_8] = bit_manip::TOGGLE_BIT(m.m256i_u8[mIndex::ST1_8], ST1::IS_MY_TURN_NOW);
@@ -221,12 +221,12 @@ int ReversiEngine::Engine8::alphabeta_m(const __m256i m) const
 		return score;
 	}
 	
-	__m256i next_m = change_turn_m(m);
-	next_m = okuhara::get_moves256(m);
+	__m256i next_m = make_next_turn_m(m);
+	next_m = okuhara::get_moves256(next_m);
 
 	if (!next_m.m256i_u64[mIndex::BB_M64]) {
-		next_m = change_turn_m(m);
-		next_m = okuhara::get_moves256(m);
+		next_m = make_next_turn_m(next_m);
+		next_m = okuhara::get_moves256(next_m);
 		if (!next_m.m256i_u64[mIndex::BB_M64]) {
 			// èüîsämíË
 			_D("èüîsämíË");
@@ -240,14 +240,14 @@ int ReversiEngine::Engine8::alphabeta_m(const __m256i m) const
 	if (CHECK_BIT(m.m256i_u8[mIndex::ST1_8],ST1::IS_MY_TURN_NOW)) {
 
 		for (; next_m.m256i_u64[mIndex::BB_M64];) {
-			__m256i m_child = next_m;
+			__m256i m_branch = next_m;
 			DWORD index;
 			_BitScanReverse64(&index, next_m.m256i_u64[mIndex::BB_M64]);
-			m_child.m256i_u64[mIndex::BB_M64] = BIT<uint64_t>(index);
+			m_branch.m256i_u64[mIndex::BB_M64] = BIT<uint64_t>(index);
 			next_m.m256i_u64[mIndex::BB_M64] = RESET_BIT(next_m.m256i_u64[mIndex::BB_M64], index);
-			m_child = okuhara::flip256(m_child);
-			++m_child.m256i_u8[mIndex::DEPTH8];
-			next_m.m256i_i16[mIndex::ALPHAi16] = max<short>(next_m.m256i_i16[mIndex::ALPHAi16], alphabeta_m(m_child));
+			m_branch = okuhara::flip256(m_branch);
+			++m_branch.m256i_u8[mIndex::DEPTH8];
+			next_m.m256i_i16[mIndex::ALPHAi16] = max<short>(next_m.m256i_i16[mIndex::ALPHAi16], alphabeta_m(m_branch));
 			if (next_m.m256i_i16[mIndex::ALPHAi16] >= next_m.m256i_i16[mIndex::BETAi16]) {
 				break;
 			}
@@ -308,18 +308,16 @@ void ReversiEngine::Engine8::return_minimax_m(node_t* const p_node)
 			if (best_score < p_node->score) {
 				best_score = p_node->score;
 				best_move = p_node->m_board.m256i_u64[mIndex::BB_M64];
-				_DOB(best_move);
 			}
 		}
 		else {
 			if (best_score > p_node->score) {
 				best_score = p_node->score;
 				best_move = p_node->m_board.m256i_u64[mIndex::BB_M64];
-				_DOB(best_move);
 			}
 		}
 		if (return_branch_cnt >= called_branch_cnt) {
-			::SetEvent(hWaitEvent);
+			::SetEvent(hEvWait);
 			for (node_t* p_node : vp_branch_nodes) {
 				node_cut(p_node);
 			}
@@ -330,10 +328,10 @@ void ReversiEngine::Engine8::return_minimax_m(node_t* const p_node)
 int ReversiEngine::Engine8::evaluate_by_turn(const __m256i m) const noexcept
 {
 	if (CHECK_BIT(m.m256i_u8[mIndex::ST1_8], ST1::IS_MY_TURN_NOW)) {
-		return (int)__popcnt64(m.m256i_i64[mIndex::BB_P64]) - (int)__popcnt64(m.m256i_i64[mIndex::BB_O64]);
+		return (int)__popcnt64(m.m256i_u64[mIndex::BB_P64]) - (int)__popcnt64(m.m256i_u64[mIndex::BB_O64]);
 	}
 	else {
-		return (int)__popcnt64(m.m256i_i64[mIndex::BB_O64]) - (int)__popcnt64(m.m256i_i64[mIndex::BB_P64]);
+		return (int)__popcnt64(m.m256i_u64[mIndex::BB_O64]) - (int)__popcnt64(m.m256i_u64[mIndex::BB_P64]);
 	}
 }
 
