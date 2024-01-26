@@ -1,6 +1,15 @@
-// Copyright (c) 2022-2023 Gold Smith
-// Released under the MIT license
-// https ://opensource.org/licenses/mit-license.php
+/**
+ * @file MemoryRental.h
+ * @brief テンプレートメモリプールクラスの実装
+ * @author Gold Smith
+ * @date 2024
+ * SPDX-License-Identifier: MIT
+ * Released under the MIT license
+ * https: //opensource.org/licenses/mit-license.php
+ *
+ * このファイル内のすべてのコードは、特に明記されていない限り、MITライセンスに従います。
+ */
+
 #pragma once
 // このクラスはWindows専用です。
 // ********使用条件を設定***********
