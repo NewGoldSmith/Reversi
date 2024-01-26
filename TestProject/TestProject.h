@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include < immintrin.h >
 #include <cstdint>
 #include <emmintrin.h>
@@ -6,6 +7,7 @@
 #include <xmmintrin.h>
 #include "../BitManip/bit_manip.h"
 #include "../Debug_fnc/debug_fnc.h"
+#include "../BitManip/bit_manip_gpl.h"
 #include "../BitManip/bit_manip_okuhara.h"
 #include "../BitManip/bit_manip_syuzuk81.h"
 #include "../Engine/Engine8.h"
