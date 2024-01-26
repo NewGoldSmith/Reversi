@@ -1,0 +1,35 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>BitManip</Name>
+    <Description>&lt;説明はありません。&gt;</Description>
+    <ProjectType>VC</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>BitManip</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <Icon>__TemplateIcon.ico</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="BitManip.vcxproj" File="BitManip.vcxproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="false" TargetFileName="$projectname$.vcxproj.filters">BitManip.vcxproj.filters</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="bit_manip.cpp">bit_manip.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="bit_manip_gpl.cpp">bit_manip_gpl.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="debug_fnc.cpp">debug_fnc.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="bit_manip_okuhara.cpp">bit_manip_okuhara.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="pch.cpp">pch.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="bit_manip_syuzuk81.cpp">bit_manip_syuzuk81.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="bit_manip.h">bit_manip.h</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="bit_manip_gpl.h">bit_manip_gpl.h</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="debug_fnc.h">debug_fnc.h</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="framework.h">framework.h</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="bit_manip_okuhara.h">bit_manip_okuhara.h</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="pch.h">pch.h</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="bit_manip_syuzuk81.h">bit_manip_syuzuk81.h</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="debug_fnc.xdc">REMOTEDEBUG\debug_fnc.xdc</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>
