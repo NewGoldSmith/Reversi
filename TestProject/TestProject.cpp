@@ -92,11 +92,13 @@ int main() {
 		m.m256i_i16[mIndex::BETAi16] = -1;
 		m.m256i_u8[mIndex::DEPTH8] = 3;
 		m.m256i_u8[mIndex::NUM_TURN8] = 4;
+		_CHKBB(m);
 		_DOB(m);
 		_DOS(m);
 		ReversiEngine::Engine8 engine(ptpp.get(), pcbe.get(), ptpcg.get());
 		engine.search(m, uhWaitEvent.get(),5);
-		m.m256i_u64[mIndex::BB_M64] = engine.await_best_move();
+		uint64_t res = engine.await_best_move();
+		m.m256i_u64[mIndex::BB_M64] = res;
 		m = okuhara::flip256(m);
 		_DOB(m);
 		_DOS(m);
@@ -105,7 +107,8 @@ int main() {
 		if (!engine.search(m, uhWaitEvent.get())) {
 			_D("no moves.");
 		};
-		m.m256i_u64[mIndex::BB_M64] = engine.await_best_move();
+		res = engine.await_best_move();
+		m.m256i_u64[mIndex::BB_M64] = res;
 		m = okuhara::flip256(m);
 		_DOB(m);
 		_DOS(m);
