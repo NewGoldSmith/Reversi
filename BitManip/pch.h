@@ -12,7 +12,6 @@
 // プリコンパイルするヘッダーをここに追加します
 #include <windows.h>
 #include <string>
-//#include <windef.h>
 #include <vector>
 #include <debugapi.h>
 #include <sstream>
@@ -23,4 +22,5 @@
 #include <iostream>
 #include <xmmintrin.h>
 #include "../Debug_fnc/debug_fnc.h"
+#include "../Engine/m256_Status.h"
 #endif //PCH_H
