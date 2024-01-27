@@ -1,6 +1,6 @@
-/**
+ï»¿/**
  * @file debug_fnc.cpp
- * @brief ƒfƒoƒbƒOŠÖ”‚ÌÀ‘•
+ * @brief ãƒ‡ãƒãƒƒã‚°é–¢æ•°ã®å®Ÿè£…
  * @author Gold Smith
  * @date 2023
  *
@@ -206,15 +206,15 @@ std::string debug_fnc::status_to_string(__m256i m)
 				ss << "0";
 			}
 			ss << ")";
-			ss << "\t" << "Œ»İ‚Ìè”Ô:\t"
+			ss << "\t" << "ç¾åœ¨ã®æ‰‹ç•ª:\t"
 				<< std::string(CHECK_BIT(m.m256i_u8[mIndex::ST1_8], ST1::IS_MY_TURN_NOW)
-					? "ƒGƒ“ƒWƒ“" : "‘Šè");
+					? "ã‚¨ãƒ³ã‚¸ãƒ³" : "ç›¸æ‰‹");
 			break;
 		}
 		case 1: {
 			ss << " ALPHA:\t  " << to_string(m.m256i_i16[mIndex::ALPHAi16]);
-			ss << "\t\t" << "æUŒãU:\t"
-				<< string(CHECK_BIT(m.m256i_u8[mIndex::ST1_8], ST1::IS_X) ? "æU(X)" : "ŒãU(C)");
+			ss << "\t\t" << "å…ˆæ”»å¾Œæ”»:\t"
+				<< string(CHECK_BIT(m.m256i_u8[mIndex::ST1_8], ST1::IS_X) ? "å…ˆæ”»(X)" : "å¾Œæ”»(C)");
 			break;
 		}
 		case 2: {
