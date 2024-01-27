@@ -44,7 +44,7 @@ namespace debug_fnc {
 #define _D(s) {::OutputDebugStringA((std::string(__FILE__ "(" _STRINGIZE(__LINE__) "):")+s+"\r\n").c_str());}
 #define _DOB(b){debug_fnc::dout({__FILE__ "(" _STRINGIZE(__LINE__)"):" #b});debug_fnc::dout_binary(b);}
 #define _DOS(b){debug_fnc::dout({__FILE__ "(" _STRINGIZE(__LINE__)"):" #b});debug_fnc::dout_status(b);}
-#define _CHKBB(b){chk_bb(b);}
+#define _CHKBB(b){try{chk_bb(b);}catch(invalid_argument &e){_D(e.what());MessageBeep(0xFFFFFFFF);}}
 #else
 #define _D(s) __noop
 #define _DOB(b) __noop
