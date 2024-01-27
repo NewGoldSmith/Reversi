@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcx
 		{A4A15C6D-4541-4FF2-8BD5-F8ED82CE3520} = {A4A15C6D-4541-4FF2-8BD5-F8ED82CE3520}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Reversi8", "Reversi8\Reversi8.vcxproj", "{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -101,6 +103,24 @@ Global
 		{DAD03223-373D-4C3A-A547-545C80A7181D}.RemoteRelease|x64.Build.0 = RemoteRelease|x64
 		{DAD03223-373D-4C3A-A547-545C80A7181D}.RemoteRelease|x86.ActiveCfg = RemoteRelease|Win32
 		{DAD03223-373D-4C3A-A547-545C80A7181D}.RemoteRelease|x86.Build.0 = RemoteRelease|Win32
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.Debug|x64.ActiveCfg = Debug|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.Debug|x64.Build.0 = Debug|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.Debug|x86.ActiveCfg = Debug|Win32
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.Debug|x86.Build.0 = Debug|Win32
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.Release|x64.ActiveCfg = Release|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.Release|x64.Build.0 = Release|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.Release|x86.ActiveCfg = Release|Win32
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.Release|x86.Build.0 = Release|Win32
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteDebug|x64.ActiveCfg = RemoteDebug|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteDebug|x64.Build.0 = RemoteDebug|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteDebug|x64.Deploy.0 = RemoteDebug|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteDebug|x86.ActiveCfg = RemoteDebug|Win32
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteDebug|x86.Build.0 = RemoteDebug|Win32
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteRelease|x64.ActiveCfg = RemoteRelease|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteRelease|x64.Build.0 = RemoteRelease|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteRelease|x64.Deploy.0 = RemoteRelease|x64
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteRelease|x86.ActiveCfg = RemoteRelease|Win32
+		{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}.RemoteRelease|x86.Build.0 = RemoteRelease|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
