@@ -242,6 +242,17 @@ std::string debug_fnc::status_to_string(__m256i m)
 	return ss.str().c_str();
 }
 
+void debug_fnc::chk_bb(__m256i m)
+{
+	using namespace ReversiEngine;
+	if (m.m256i_u64[mIndex::BB_P64] & m.m256i_u64[mIndex::BB_O64]) {
+		std::stringstream ss;
+		ss << "\r\n" << __FILE__ << "(" << std::to_string(__LINE__) << "):"
+			<< "argument error.";
+		throw std::invalid_argument(ss.str().c_str());
+	}
+}
+
 void debug_fnc::dout(const std::string& str)
 {
 	OutputDebugStringA((str + "\r\n").c_str());
