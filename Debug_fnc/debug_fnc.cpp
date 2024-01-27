@@ -21,15 +21,15 @@ std::string debug_fnc::binary_to_string(uint8_t b)
 
 std::vector<std::string> debug_fnc::boardToString(uint64_t p, uint64_t o, char cp, char co, char cv) {
 	std::vector<std::string> result(8);
+	if (!(p & o)) {
+		std::stringstream ss;
+		ss << "\r\n" << __FILE__ << "(" << std::to_string(__LINE__) << "):"
+			<< "argument error.";
+		throw std::invalid_argument(ss.str().c_str());
+	}
+
 	for (int i = 63; i >= 0; --i) {
-		if (p & (1ULL << i) && o & (1ULL << i)) {
-			std::stringstream ss;
-			ss << __FILE__ << "(" << std::to_string(__LINE__) << "):"
-				<< "invalid_argument:(" << std::to_string(7 - i % 8) << ","
-				<< std::to_string(7 - i / 8) << ")" ;
-			throw std::invalid_argument(ss.str().c_str());
-		}
-		else if (p & (1ULL << i)) {
+		if (p & (1ULL << i)) {
 			result[i / 8] += cp;
 		}
 		else if (o & (1ULL << i)) {
