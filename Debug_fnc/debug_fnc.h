@@ -1,6 +1,6 @@
-/**
+ï»¿/**
  * @file debug_fnc.h
- * @brief ƒfƒoƒbƒOŠÖ”‚ÌéŒ¾
+ * @brief ãƒ‡ãƒãƒƒã‚°é–¢æ•°ã®å®£è¨€
  * @author Gold Smith
  * @date 2023 2024
  *
