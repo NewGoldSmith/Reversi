@@ -24,7 +24,7 @@ namespace ReversiEngine
 	};
 	/// <summary>
 	/// IS_MY_TURN_NOWコンピュータの手番である。
-	/// IS_C コンピューターが先手番(C)とする。
+	/// IS_C コンピューターが後手番(C)とする。
 	/// F1_IS_C2Cコンピューター同志の対戦。
 	/// </summary>
 	const enum ST1 :uint8_t { IS_MY_TURN_NOW, IS_X, IS_C2C };
