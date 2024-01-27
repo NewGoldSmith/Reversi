@@ -9,6 +9,15 @@
 
 __m256i __vectorcall bit_manip::okuhara::get_moves256(const __m256i poms)
 {
+#ifdef _DEBUG
+	using namespace ReversiEngine;
+	if (poms.m256i_u64[mIndex::BB_P64] & poms.m256i_u64[mIndex::BB_O64]) {
+		std::stringstream ss;
+		ss << "\r\n" << __FILE__ << "(" << std::to_string(__LINE__) << "):"
+			<< "argument error.";
+		throw std::invalid_argument(ss.str().c_str());
+	}
+#endif // _DEBUG
 	__m256i	PP, mOO, MM, flip_l, flip_r, pre_l, pre_r, shift1897;
 	__m128i	M;
 	shift1897 = _mm256_set_epi64x(7, 9, 8, 1);
@@ -39,6 +48,16 @@ __m256i __vectorcall bit_manip::okuhara::get_moves256(const __m256i poms)
 
 __m256i __vectorcall bit_manip::okuhara::flip256(const __m256i poms)
 {
+#ifdef _DEBUG
+	using namespace ReversiEngine;
+	if (poms.m256i_u64[mIndex::BB_P64] & poms.m256i_u64[mIndex::BB_O64]) {
+		std::stringstream ss;
+		ss << "\r\n" << __FILE__ << "(" << std::to_string(__LINE__) << "):"
+			<< "argument error.";
+		throw std::invalid_argument(ss.str().c_str());
+	}
+#endif // _DEBUG
+
 	const __m256i shift1897 = _mm256_set_epi64x(7, 9, 8, 1);
 	// masked opponent 
 	const __m256i mOO = _mm256_and_si256(_mm256_permute4x64_epi64(poms, _MM_SHUFFLE(1, 1, 1, 1)),
