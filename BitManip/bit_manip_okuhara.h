@@ -15,6 +15,7 @@
 #endif
 
 namespace bit_manip::okuhara {
+
 	/// <summary>
 	/// 有効な手を探す。
 	/// </summary>

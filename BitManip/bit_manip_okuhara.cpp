@@ -9,9 +9,9 @@
 
 __m256i __vectorcall bit_manip::okuhara::get_moves256(const __m256i poms)
 {
-	__m256i	PP, mOO, MM, flip_l, flip_r, pre_l, pre_r, shift1897;
+	__m256i	PP, mOO, MM, flip_l, flip_r, pre_l, pre_r;
 	__m128i	M;
-	shift1897 = _mm256_set_epi64x(7, 9, 8, 1);
+	__m256i shift1897 = _mm256_set_epi64x(7ULL, 9ULL, 8ULL, 1ULL);
 	__m256i mflipH = _mm256_set_epi64x(0x7e7e7e7e7e7e7e7e, 0x7e7e7e7e7e7e7e7e, -1, 0x7e7e7e7e7e7e7e7e);
 
 	PP = _mm256_broadcastq_epi64(_mm_cvtsi64_si128(poms.m256i_u64[0]));
