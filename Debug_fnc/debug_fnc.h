@@ -29,7 +29,7 @@ namespace debug_fnc {
 	void dout_binary(__m256i m);
 	void dout_status(__m256i m);
 	std::string status_to_string(__m256i m);
-	void chk_bb(__m256i m);
+	bool chk_bb(__m256i m);
 	void dout(const std::string& str);
 	std::string GetErrString(DWORD dw);
 	const std::string ErrOut_(
@@ -44,7 +44,7 @@ namespace debug_fnc {
 #define _D(s) {::OutputDebugStringA((std::string(__FILE__ "(" _STRINGIZE(__LINE__) "):")+s+"\r\n").c_str());}
 #define _DOB(b){debug_fnc::dout({__FILE__ "(" _STRINGIZE(__LINE__)"):" #b});debug_fnc::dout_binary(b);}
 #define _DOS(b){debug_fnc::dout({__FILE__ "(" _STRINGIZE(__LINE__)"):" #b});debug_fnc::dout_status(b);}
-#define _CHKBB(b){try{chk_bb(b);}catch(invalid_argument &e){_D(e.what());MessageBeep(0xFFFFFFFF);}}
+#define _CHKBB(b) {if(debug_fnc::chk_bb(b)){_D("_CHKBB:妥当です。")}else{_D("_CHKBB:不適切です。");MessageBeep(0xFFFFFFFF);}}
 #else
 #define _D(s) __noop
 #define _DOB(b) __noop

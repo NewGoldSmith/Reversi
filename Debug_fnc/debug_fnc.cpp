@@ -9,6 +9,9 @@
  */
 #include "pch.h"
 #include "debug_fnc.h"
+using namespace ReversiEngine;
+using namespace bit_manip;
+using namespace std;
 
 std::string debug_fnc::binary_to_string(uint8_t b)
 {
@@ -151,9 +154,6 @@ void debug_fnc::dout_status(__m256i m)
 
 std::string debug_fnc::status_to_string(__m256i m)
 {
-	using namespace ReversiEngine;
-	using namespace bit_manip;
-	using namespace std;
 	std::stringstream ss;
 	uint64_t C;
 	uint64_t X;
@@ -186,7 +186,6 @@ std::string debug_fnc::status_to_string(__m256i m)
 		{
 		case 0: {
 			DWORD index;
-			unsigned char valid;
 			string str;
 			ss << " move:\t (";
 			if (_BitScanReverse64(&index, m.m256i_u64[mIndex::BB_M64]) &&
@@ -235,12 +234,13 @@ std::string debug_fnc::status_to_string(__m256i m)
 	return ss.str().c_str();
 }
 
-void debug_fnc::chk_bb(__m256i m)
+bool debug_fnc::chk_bb(__m256i m)
 {
 	using namespace ReversiEngine;
 	if (m.m256i_u64[mIndex::BB_P64] & m.m256i_u64[mIndex::BB_O64]) {
-		throw std::invalid_argument("Error.Invalid m256 Status.");
+		return false;
 	}
+	return true;
 }
 
 void debug_fnc::dout(const std::string& str)
