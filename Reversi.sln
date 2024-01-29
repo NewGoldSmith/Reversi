@@ -24,6 +24,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcx
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Reversi8", "Reversi8\Reversi8.vcxproj", "{459CB872-B2FE-44DE-A7A2-9F8D3D061C2B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4578BA94-82E6-48DC-8076-1A488E1CEC30} = {4578BA94-82E6-48DC-8076-1A488E1CEC30}
+		{A4A15C6D-4541-4FF2-8BD5-F8ED82CE3520} = {A4A15C6D-4541-4FF2-8BD5-F8ED82CE3520}
+		{DAD03223-373D-4C3A-A547-545C80A7181D} = {DAD03223-373D-4C3A-A547-545C80A7181D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
