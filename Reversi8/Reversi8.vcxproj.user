@@ -2,20 +2,21 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RemoteDebug|x64'">
     <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
-    <RemoteDebuggerCommand>\\192.168.100.205$(HOMEPATH)\$(SolutionName)\$(TargetFileName)</RemoteDebuggerCommand>
-    <RemoteDebuggerWorkingDirectory>\\192.168.100.205$(HOMEPATH)\$(SolutionName)\</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerCommand>\\192.168.100.205$(HOMEPATH)\$(SolutionName)\$(Configuration)\$(TargetFileName)</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>\\192.168.100.205$(HOMEPATH)\$(SolutionName)\$(Configuration)\</RemoteDebuggerWorkingDirectory>
     <RemoteDebuggerServerName>192.168.100.205</RemoteDebuggerServerName>
-    <DeploymentDirectory>\\$(RemoteDebuggerServerName)$(HOMEPATH)\$(SolutionName)\</DeploymentDirectory>
+    <DeploymentDirectory>\\$(RemoteDebuggerServerName)$(HOMEPATH)\$(SolutionName)\$(Configuration)\</DeploymentDirectory>
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
     <RemoteDebuggerDeployCppRuntime>false</RemoteDebuggerDeployCppRuntime>
     <AdditionalFiles>C:\Program Files\Microsoft Visual Studio\2022\Community\Team Tools\DiagnosticsHub\Collector\amd64\*.*</AdditionalFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RemoteRelease|x64'">
     <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
-    <RemoteDebuggerCommand>\\192.168.100.205$(HOMEPATH)\$(SolutionName)\$(TargetFileName)</RemoteDebuggerCommand>
-    <RemoteDebuggerWorkingDirectory>\\192.168.100.205$(HOMEPATH)\$(SolutionName)\</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerCommand>\\192.168.100.205$(HOMEPATH)\$(SolutionName)\$(Configuration)\$(TargetFileName)</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>\\192.168.100.205$(HOMEPATH)\$(SolutionName)\$(Configuration)\</RemoteDebuggerWorkingDirectory>
     <RemoteDebuggerServerName>192.168.100.205</RemoteDebuggerServerName>
-    <DeploymentDirectory>\\$(RemoteDebuggerServerName)$(HOMEPATH)\$(SolutionName)\</DeploymentDirectory>
-    <AdditionalFiles>C:\Program Files\Microsoft Visual Studio\2022\Community\Team Tools\DiagnosticsHub\Collector\amd64\*.*</AdditionalFiles>
+    <DeploymentDirectory>\\$(RemoteDebuggerServerName)$(HOMEPATH)\$(SolutionName)\$(Configuration)\</DeploymentDirectory>
+    <AdditionalFiles>
+    </AdditionalFiles>
   </PropertyGroup>
 </Project>

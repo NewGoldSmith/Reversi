@@ -30,5 +30,6 @@
 #include "../Debug_fnc/debug_fnc.h"
 #include "../BitManip/bit_manip.h"
 #include "../BitManip/bit_manip_okuhara.h"
-#include "../Engine/Engine.h"
+#include "../Engine/Engine8.h"
+#include "../Engine/m256_Status.h"
 #endif //PCH_H

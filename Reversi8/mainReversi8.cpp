@@ -13,7 +13,7 @@
 #include "mainReversi8.h"
 
 using namespace std;
-
+using namespace Reversi8;
 int main()
 {
 	cout << R"(/**
