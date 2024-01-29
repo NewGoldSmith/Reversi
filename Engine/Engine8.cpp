@@ -71,7 +71,7 @@ ReversiEngine::Engine8::Engine8(PTP_POOL const ptpp, PTP_CALLBACK_ENVIRON const 
 		pNode->vp_branch_nodes = {};
 
 		for (; next_board.m256i_u64[mIndex::BB_M64];) {
-			++ pNode->called_branch_cnt;
+			++pNode->called_branch_cnt;
 			node_t* pBranchNode = pNode->pEngine->p_mr_Node->Lend();
 			pBranchNode->m_board = next_board;
 			pBranchNode->called_branch_cnt = 0;
@@ -82,7 +82,7 @@ ReversiEngine::Engine8::Engine8(PTP_POOL const ptpp, PTP_CALLBACK_ENVIRON const 
 			pBranchNode->m_board.m256i_u64[mIndex::BB_M64] = BIT<uint64_t>(index);
 			next_board.m256i_u64[mIndex::BB_M64] = RESET_BIT(next_board.m256i_u64[mIndex::BB_M64], index);
 			pBranchNode->m_board = okuhara::flip256(pBranchNode->m_board);
-			++ pBranchNode->m_board.m256i_u8[mIndex::DEPTH8];
+			++pBranchNode->m_board.m256i_u8[mIndex::DEPTH8];
 			pBranchNode->p_parent = pNode;
 			if (!(pBranchNode->pwk = CreateThreadpoolWork(
 				pNode->pEngine->pfnwkMiniMax
@@ -94,7 +94,7 @@ ReversiEngine::Engine8::Engine8(PTP_POOL const ptpp, PTP_CALLBACK_ENVIRON const 
 			pNode->vp_branch_nodes.push_back(pBranchNode);
 		}
 		pNode->called_branch_cnt = (int)pNode->vp_branch_nodes.size();
-	}
+			}
 }
 
 {
@@ -207,7 +207,7 @@ void ReversiEngine::Engine8::node_cut(node_t* const p_node)
 	p_mr_Node->Return(p_node);
 }
 
-int ReversiEngine::Engine8::alphabeta_m(const __m256i m) const
+int ReversiEngine::Engine8::alphabeta_m(const __m256i m) const noexcept
 {
 	if (m.m256i_u8[mIndex::DEPTH8] >= second_depth)
 	{
