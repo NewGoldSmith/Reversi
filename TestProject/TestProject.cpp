@@ -89,7 +89,7 @@ int main() {
 
 		__m256i m = _mm256_setr_epi64x(p1, o1, m1, 0);
 		m.m256i_i16[mIndex::ALPHAi16] = 2;
-		m.m256i_i16[mIndex::BETAi16] = -1;
+		m.m256i_i16[mIndex::BETAi16] = -2;
 		m.m256i_u8[mIndex::DEPTH8] = 3;
 		m.m256i_u8[mIndex::NUM_TURN8] = 4;
 		_CHKBB(m);
@@ -102,7 +102,7 @@ int main() {
 		m = okuhara::flip256(m);
 		_DOB(m);
 		_DOS(m);
-		m = engine.make_next_turn_m(m);
+		m = make_next_turn_m(m);
 		_DOB(m);
 		if (!engine.search(m, uhWaitEvent.get())) {
 			_D("no moves.");
