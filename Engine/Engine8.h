@@ -18,10 +18,8 @@
 
 namespace ReversiEngine
 {
-	constexpr int N = 8;
 	constexpr int INF = 10000;
-	constexpr int BREAK_CODE = INF + 5;
-	constexpr unsigned NODE_UNIT_SIZE = 0x20000;
+	constexpr unsigned DEF_NODE_UNIT_SIZE = 0x20000;
 
 	class Engine8
 	{
@@ -31,26 +29,24 @@ namespace ReversiEngine
 			, PTP_CALLBACK_ENVIRON const pcbe
 			, PTP_CLEANUP_GROUP const ptpcg);
 		~Engine8();
-		Engine8(const Engine8&) = delete;
+		Engine8(Engine8&) = delete;
 		Engine8(Engine8&&)noexcept = delete;
-		Engine8& operator()(const Engine8&) = delete;
-		Engine8& operator=(const Engine8&) = delete;
-		bool operator==(const Engine8&) const = delete;
+		Engine8& operator()(Engine8&) = delete;
+		Engine8& operator=(Engine8&) = delete;
+		bool operator==(Engine8&) = delete;
 		bool search(__m256i board
 			, HANDLE hEvWait
 			, uint16_t max_depth = 1
 			, uint16_t first_depth = 1
-			, uint64_t num_array = 0x2000);
+			, uint64_t num_array = DEF_NODE_UNIT_SIZE);
 		uint64_t await_best_move();
 		int await_best_score();
-		__m256i __vectorcall make_next_turn_m(const __m256i m)const;
 	private:
 		struct node_t;
 		CRITICAL_SECTION cs = {};
 		PTP_POOL const ptpp{};
 		PTP_CALLBACK_ENVIRON const pcbe{};
 		PTP_CLEANUP_GROUP const ptpcg{};
-		//const PTP_CLEANUP_GROUP_CANCEL_CALLBACK pfng{};
 		const std::unique_ptr< CRITICAL_SECTION
 			, decltype(DeleteCriticalSection)*> pcs;
 		node_t* p_node_array{};
@@ -83,7 +79,7 @@ namespace ReversiEngine
 			node_t(node_t&&)noexcept = delete;
 			node_t& operator () (node_t&) = delete;
 			node_t& operator = (node_t&) = delete;
-			bool operator == (node_t&)const = delete;
+			bool operator == (node_t&) = delete;
 		};
 
 		PTP_WORK_CALLBACK const pfnwkMiniMax;
@@ -104,8 +100,5 @@ namespace ReversiEngine
 /// <returns>ï]âøílÅB</returns>
 		int alphabeta_m(const __m256i m)const;
 		void return_minimax_m(node_t* const p_node);
-		int evaluate_by_turn(const __m256i m)const noexcept;
-
-
 	};
 }

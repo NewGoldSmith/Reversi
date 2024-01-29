@@ -2,7 +2,7 @@
  * @file MemoryRental.h
  * @brief テンプレートメモリプールクラスの実装
  * @author Gold Smith
- * @date 2024
+ * @date 2022-2024
  * SPDX-License-Identifier: MIT
  * Released under the MIT license
  * https: //opensource.org/licenses/mit-license.php

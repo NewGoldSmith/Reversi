@@ -357,6 +357,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine8.cpp" />
+    <ClCompile Include="m256_Status.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='RemoteDebug|x64'">Create</PrecompiledHeader>

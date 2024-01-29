@@ -10,6 +10,7 @@
  * このファイル内のすべてのコードは、特に明記されていない限り、MITライセンスに従います。
  */
 #pragma once
+#include "pch.h"
 namespace ReversiEngine
 {
 	/// <summary>
@@ -28,4 +29,7 @@ namespace ReversiEngine
 	/// F1_IS_C2Cコンピューター同志の対戦。
 	/// </summary>
 	const enum ST1 :uint8_t { IS_MY_TURN_NOW, IS_X, IS_C2C };
+	__m256i __vectorcall make_next_turn_m(const __m256i m)noexcept;
+	int evaluate_by_turn(const __m256i m)noexcept;
+
 }
