@@ -248,7 +248,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <EnableEnhancedInstructionSet />
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <Optimization>Disabled</Optimization>
       <EnableParallelCodeGeneration>
       </EnableParallelCodeGeneration>
@@ -285,7 +285,7 @@
       <CallingConvention>
       </CallingConvention>
       <SupportJustMyCode>false</SupportJustMyCode>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <EnableParallelCodeGeneration>
       </EnableParallelCodeGeneration>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
